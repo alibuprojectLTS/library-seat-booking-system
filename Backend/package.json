@@ -16,7 +16,7 @@
   ],
   "author": "alibuprojectLTS",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
