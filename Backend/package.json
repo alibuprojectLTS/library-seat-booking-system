@@ -1,0 +1,15 @@
+{
+  "name": "library-seat-booking-backend",
+  "version": "1.0.0",
+  "description": "Library Seat Booking System - Backend API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["library", "booking", "seats", "api"],
+  "author": "alibuprojectLTS",
+  "license": "MIT",
+  "type": "commonjs"
+}
