@@ -1,0 +1,65 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
+import sequelize from './config/database.js';
+import routes from './routes/index.js';
+import { errorHandler } from './middleware/errorHandler.js';
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(compression());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: '🚀 Library Seat Booking System API',
+    status: 'Running',
+    version: '1.0.0'
+  });
+});
+
+// Routes
+app.use('/api', routes);
+
+// Error Handler
+app.use(errorHandler);
+
+// Start Server
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ PostgreSQL connected successfully');
+
+    await sequelize.sync({ alter: true });
+    console.log('✅ Database synced');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📍 http://localhost:${PORT}`);
+      console.log(`📚 Swagger Docs: http://localhost:${PORT}/api-docs`);
+    });
+  } catch (error) {
+    console.error('❌ Server startup failed:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
