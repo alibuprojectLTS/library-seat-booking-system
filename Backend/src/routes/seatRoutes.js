@@ -1,11 +1,18 @@
 import express from 'express';
-import { getSections } from '../controllers/seatController.js';
+import {
+  getSections,
+  getSeatsBySection,
+  getSeatStatus
+} from '../controllers/seatController.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Public routes
 router.get('/sections', getSections);
 
-// Seats - Phase 3
-// router.get('/sections/:id/seats', getSeatsBySection);
+// Protected routes
+router.get('/sections/:id/seats', authenticate, getSeatsBySection);
+router.get('/status', authenticate, getSeatStatus);
 
 export default router;
