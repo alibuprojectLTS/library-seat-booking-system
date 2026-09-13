@@ -1,5 +1,4 @@
 import swaggerAutogen from 'swagger-autogen';
-
 const doc = {
   info: {
     title: 'Library Seat Booking System API',
