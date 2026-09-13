@@ -13,6 +13,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: .
@@ -27,9 +32,12 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=FGBROC
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./src:/app/src
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
       - /app/node_modules
     restart: unless-stopped
 

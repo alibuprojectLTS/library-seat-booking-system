@@ -1,4 +1,4 @@
-import { LibrarySection, Seat } from '../models/index.js';
+import { LibrarySection } from '../models/index.js';
 
 export const getSections = async (req, res) => {
   try {
@@ -20,24 +20,25 @@ export const getSections = async (req, res) => {
   }
 };
 
-export const getSeatsBySection = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const seats = await Seat.findAll({
-      where: { section_id: id },
-      attributes: ['seat_id', 'seat_label', 'row_number', 'column_number', 'seat_status']
-    });
-
-    res.json({
-      success: true,
-      seats
-    });
-  } catch (error) {
-    console.error('Get seats error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Failed to fetch seats'
-    });
-  }
-};
+// ============================================================
+// SEATS - Will be added in Phase 3
+// ============================================================
+// export const getSeatsBySection = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const seats = await Seat.findAll({
+//       where: { section_id: id },
+//       attributes: ['seat_id', 'seat_label', 'row_number', 'column_number', 'seat_status']
+//     });
+//     res.json({
+//       success: true,
+//       seats
+//     });
+//   } catch (error) {
+//     console.error('Get seats error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || 'Failed to fetch seats'
+//     });
+//   }
+// };

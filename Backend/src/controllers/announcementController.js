@@ -1,4 +1,5 @@
 import { Announcement, User } from '../models/index.js';
+import { Op } from 'sequelize';  // ← ADD THIS LINE
 
 export const getActiveAnnouncements = async (req, res) => {
   try {
