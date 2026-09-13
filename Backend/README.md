@@ -23,90 +23,81 @@ A robust RESTful API for managing library seat bookings, built with Node.js, Exp
 Backend/
 ├── src/
 │ ├── config/
-│ │ ├── database.js # PostgreSQL connection
-│ │ ├── swagger.js # Swagger configuration
-│ │ └── passport.js # Google OAuth (future)
-│ │
+│ │ ├── database.js
+│ │ ├── swagger.js
+│ │ └── passport.js
 │ ├── controllers/
-│ │ ├── adminController.js # Admin dashboard & reports
-│ │ ├── announcementController.js # Announcement CRUD
-│ │ ├── authController.js # Register, Login, Profile
-│ │ ├── bookingController.js # Booking creation & management
-│ │ ├── csvController.js # CSV seat upload
-│ │ ├── paymentController.js # PayChangu integration
-│ │ ├── queryController.js # User queries & replies
-│ │ ├── seatController.js # Seat map & availability
-│ │ ├── statusController.js # Library status updates
-│ │ ├── ticketController.js # Ticket & QR generation
-│ │ └── userController.js # User profile management
-│ │
+│ │ ├── adminController.js
+│ │ ├── announcementController.js
+│ │ ├── authController.js
+│ │ ├── bookingController.js
+│ │ ├── csvController.js
+│ │ ├── paymentController.js
+│ │ ├── queryController.js
+│ │ ├── seatController.js
+│ │ ├── statusController.js
+│ │ ├── ticketController.js
+│ │ └── userController.js
 │ ├── middleware/
-│ │ ├── admin.js # Admin role verification
-│ │ ├── auth.js # JWT authentication
-│ │ ├── errorHandler.js # Global error handling
-│ │ ├── rateLimiter.js # Rate limiting
-│ │ ├── upload.js # Multer file upload
-│ │ └── validation.js # Request validation
-│ │
+│ │ ├── admin.js
+│ │ ├── auth.js
+│ │ ├── errorHandler.js
+│ │ ├── rateLimiter.js
+│ │ ├── upload.js
+│ │ └── validation.js
 │ ├── models/
-│ │ ├── index.js # Model associations
-│ │ ├── Announcement.js # Announcement model
-│ │ ├── Booking.js # Booking model
-│ │ ├── BookingItem.js # Booking items model
-│ │ ├── LibrarySection.js # Library sections model
-│ │ ├── LibraryStatus.js # Library status model
-│ │ ├── NewsletterSubscription.js # Newsletter model
-│ │ ├── Notification.js # Notification model
-│ │ ├── Payment.js # Payment model
-│ │ ├── Query.js # User query model
-│ │ ├── QueryReply.js # Query reply model
-│ │ ├── Seat.js # Seat model
-│ │ ├── Ticket.js # Ticket model
-│ │ └── User.js # User model
-│ │
+│ │ ├── index.js
+│ │ ├── Announcement.js
+│ │ ├── Booking.js
+│ │ ├── BookingItem.js
+│ │ ├── LibrarySection.js
+│ │ ├── LibraryStatus.js
+│ │ ├── NewsletterSubscription.js
+│ │ ├── Notification.js
+│ │ ├── Payment.js
+│ │ ├── Query.js
+│ │ ├── QueryReply.js
+│ │ ├── Seat.js
+│ │ ├── Ticket.js
+│ │ └── User.js
 │ ├── routes/
-│ │ ├── index.js # Main router
-│ │ ├── adminRoutes.js # Admin routes
-│ │ ├── announcementRoutes.js # Announcement routes
-│ │ ├── authRoutes.js # Authentication routes
-│ │ ├── bookingRoutes.js # Booking routes
-│ │ ├── paymentRoutes.js # Payment routes
-│ │ ├── queryRoutes.js # Query routes
-│ │ ├── seatRoutes.js # Seat routes
-│ │ ├── statusRoutes.js # Status routes
-│ │ ├── ticketRoutes.js # Ticket routes
-│ │ └── userRoutes.js # User routes
-│ │
+│ │ ├── index.js
+│ │ ├── adminRoutes.js
+│ │ ├── announcementRoutes.js
+│ │ ├── authRoutes.js
+│ │ ├── bookingRoutes.js
+│ │ ├── paymentRoutes.js
+│ │ ├── queryRoutes.js
+│ │ ├── seatRoutes.js
+│ │ ├── statusRoutes.js
+│ │ ├── ticketRoutes.js
+│ │ └── userRoutes.js
 │ ├── services/
-│ │ ├── csvService.js # CSV parsing
-│ │ ├── emailService.js # Email sending
-│ │ ├── notificationService.js # In-app notifications
-│ │ ├── paymentService.js # PayChangu integration
-│ │ └── qrService.js # QR code generation
-│ │
+│ │ ├── csvService.js
+│ │ ├── emailService.js
+│ │ ├── notificationService.js
+│ │ ├── paymentService.js
+│ │ └── qrService.js
 │ ├── utils/
-│ │ ├── constants.js # App constants
-│ │ ├── helpers.js # Utility functions
-│ │ ├── logger.js # Logging utility
-│ │ └── response.js # Standardized responses
-│ │
+│ │ ├── constants.js
+│ │ ├── helpers.js
+│ │ ├── logger.js
+│ │ └── response.js
 │ ├── validators/
-│ │ ├── authValidator.js # Auth validation
-│ │ ├── bookingValidator.js # Booking validation
-│ │ ├── queryValidator.js # Query validation
-│ │ └── seatValidator.js # Seat validation
-│ │
-│ └── index.js # Application entry point
-│
-├── uploads/ # CSV uploads folder
-├── logs/ # Application logs
-├── .env # Environment variables
-├── .gitignore # Git ignore
-├── docker-compose.yml # Docker Compose
-├── Dockerfile # Docker configuration
-├── package.json # Dependencies
-├── package-lock.json # Lock file
-└── README.md # Documentation
+│ │ ├── authValidator.js
+│ │ ├── bookingValidator.js
+│ │ ├── queryValidator.js
+│ │ └── seatValidator.js
+│ └── index.js
+├── uploads/
+├── logs/
+├── .env
+├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
+├── package.json
+├── package-lock.json
+└── README.md
 
 text
 
@@ -178,7 +169,6 @@ bash
 npm install
 3. Set up PostgreSQL
 bash
-# Create database
 psql -U postgres
 CREATE DATABASE library_booking;
 \q
@@ -188,17 +178,54 @@ cp .env.example .env
 # Update .env with your credentials
 5. Start the server
 bash
-# Development mode
 npm run dev
-
-# Production mode
-npm start
 📚 Current API Endpoints
 🔐 Authentication
 Method	Endpoint	Description	Auth
 POST	/api/auth/register	Register a new user	❌
 POST	/api/auth/login	Login user	❌
 GET	/api/auth/me	Get current user profile	✅
+🏛️ Library Status
+Method	Endpoint	Description	Auth
+GET	/api/status	Get library open/closed status, capacity, and message	❌
+🪑 Seats
+Method	Endpoint	Description	Auth
+GET	/api/seats/sections	Get all library sections (Computer, General, Discussion)	❌
+GET	/api/seats/sections/:id/seats	Get seats by section with status	✅
+GET	/api/seats/status	Get real-time seat availability	✅
+📅 Bookings
+Method	Endpoint	Description	Auth
+POST	/api/bookings	Create booking (max 5 seats)	✅
+GET	/api/bookings/my	Get user's bookings	✅
+GET	/api/bookings/:id	Get single booking details	✅
+DELETE	/api/bookings/:id/cancel	Cancel a booking	✅
+📖 How Each Endpoint Works
+🔐 Authentication
+POST /api/auth/register — Creates a new user with email and password. Phone is optional.
+
+POST /api/auth/login — Verifies credentials and returns a JWT token for authenticated requests.
+
+GET /api/auth/me — Returns the logged-in user's profile using the JWT token.
+
+🏛️ Library Status
+GET /api/status — Returns the current library state (open/full/closed/maintenance), capacity used/total, open hours, and any admin message.
+
+🪑 Seats
+GET /api/seats/sections — Returns all active library sections with capacity and price per seat.
+
+GET /api/seats/sections/:id/seats — Returns all seats in a given section with seat label, position, and status (available/booked/deactivated).
+
+GET /api/seats/status — Returns total, available, and booked seat counts plus occupancy percentage.
+
+📅 Bookings
+POST /api/bookings — Creates a booking for up to 5 seats. Requires booking_date, an array of seat IDs, and an array of occupant names. Marks selected seats as booked and sets a 15-minute expiry.
+
+GET /api/bookings/my — Returns all bookings for the logged-in user, including seat and occupant details.
+
+GET /api/bookings/:id — Returns a single booking by ID (only if it belongs to the logged-in user).
+
+DELETE /api/bookings/:id/cancel — Cancels a booking and releases the seats back to available.
+
 📚 API Documentation
 Once the server is running, Swagger documentation is available at:
 
