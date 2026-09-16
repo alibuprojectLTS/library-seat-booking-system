@@ -37,10 +37,13 @@ class PaymentService {
       );
 
       if (response.data.status === 'success') {
+        // ✅ Use PayChangu's tx_ref if available (fallback to ours)
+        const paychanguTxRef = response.data.data?.tx_ref || txRef;
+
         return {
           success: true,
           checkoutUrl: response.data.data.checkout_url,
-          txRef: txRef,
+          txRef: paychanguTxRef, // ← Return PayChangu's ref
           paymentId: response.data.data.payment_id
         };
       }
