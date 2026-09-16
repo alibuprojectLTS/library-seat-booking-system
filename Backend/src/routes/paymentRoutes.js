@@ -16,7 +16,27 @@ router.get('/webhook', webhookHandler);
 // Protected routes
 router.use(authenticate);
 
-router.post('/initiate', initiatePayment);
+// ✅ Add Swagger comment for body
+router.post('/initiate',
+  /*
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              bookingId: { type: "integer", example: 1 }
+            },
+            required: ["bookingId"]
+          }
+        }
+      }
+    }
+  */
+  initiatePayment
+);
+
 router.get('/verify/:txRef', verifyPayment);
 router.get('/history', getPaymentHistory);
 

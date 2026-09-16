@@ -5,14 +5,19 @@ dotenv.config();
 
 export const authenticate = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader) {
       return res.status(401).json({
         success: false,
         message: 'Authentication required'
       });
     }
+
+    // ✅ Accept both "Bearer <token>" and "<token>"
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : authHeader;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;

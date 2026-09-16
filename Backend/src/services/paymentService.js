@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const PAYCHANGU_API_URL = process.env.PAYCHANGU_API_URL || 'https://api.paychangu.com';
+const PAYCHANGU_API_URL = 'https://api.paychangu.com';
+
 const PAYCHANGU_SECRET_KEY = process.env.PAYCHANGU_SECRET_KEY;
 
 class PaymentService {
@@ -13,6 +14,10 @@ class PaymentService {
   static async initiatePayment({ amount, bookingId, userId, description, redirectUrl, cancelUrl }) {
     try {
       const txRef = `LIB-${bookingId}-${Date.now()}`;
+      const callbackUrl = `${process.env.API_URL}/api/payments/webhook`;
+
+      console.log('🔗 Callback URL:', callbackUrl);
+      console.log('🔗 API URL:', PAYCHANGU_API_URL);
 
       const response = await axios.post(
         `${PAYCHANGU_API_URL}/payment`,
@@ -25,7 +30,7 @@ class PaymentService {
           description: description,
           redirect_url: redirectUrl,
           cancel_url: cancelUrl,
-          callback_url: `${process.env.API_URL}/api/payments/webhook`
+          callback_url: callbackUrl
         },
         {
           headers: {
@@ -36,14 +41,16 @@ class PaymentService {
         }
       );
 
-      if (response.data.status === 'success') {
-        // ✅ Use PayChangu's tx_ref if available (fallback to ours)
-        const paychanguTxRef = response.data.data?.tx_ref || txRef;
+      console.log('PayChangu response:', JSON.stringify(response.data, null, 2));
 
+      if (response.data.status === 'success') {
+        // ✅ Save BOTH refs — use ours for querying, but store PayChangu's for webhook matching
+     const paychanguTxRef = response.data.data?.data?.tx_ref || txRef;
         return {
           success: true,
           checkoutUrl: response.data.data.checkout_url,
-          txRef: paychanguTxRef, // ← Return PayChangu's ref
+          txRef: paychanguTxRef,
+          localTxRef: txRef, // Keep local ref too
           paymentId: response.data.data.payment_id
         };
       }
@@ -66,6 +73,8 @@ class PaymentService {
    */
   static async verifyPayment(txRef) {
     try {
+      console.log('🔍 Verifying txRef:', txRef);
+
       const response = await axios.get(
         `${PAYCHANGU_API_URL}/verify-payment/${txRef}`,
         {
@@ -75,6 +84,8 @@ class PaymentService {
           }
         }
       );
+
+      console.log('Verify response:', JSON.stringify(response.data, null, 2));
 
       if (response.data.status === 'success' && response.data.data?.status === 'success') {
         return {
