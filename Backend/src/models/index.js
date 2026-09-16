@@ -8,6 +8,8 @@ import Booking from './Booking.js';
 import BookingItem from './BookingItem.js';
 import Payment from './Payment.js';
 import Ticket from './Ticket.js';
+import Query from './Query.js';
+import QueryReply from './QueryReply.js';
 
 // ============================================================
 // ASSOCIATIONS
@@ -45,9 +47,21 @@ Payment.belongsTo(Booking, { foreignKey: 'booking_id' });
 Booking.hasOne(Ticket, { foreignKey: 'booking_id' });
 Ticket.belongsTo(Booking, { foreignKey: 'booking_id' });
 
-// ============================================================
-// EXPORTS
-// ============================================================
+// User → Queries
+User.hasMany(Query, { foreignKey: 'user_id' });
+Query.belongsTo(User, { foreignKey: 'user_id' });
+
+// Admin → Queries
+User.hasMany(Query, { foreignKey: 'admin_id' });
+Query.belongsTo(User, { foreignKey: 'admin_id', as: 'Admin' });
+
+// Query → QueryReplies
+Query.hasMany(QueryReply, { foreignKey: 'query_id' });
+QueryReply.belongsTo(Query, { foreignKey: 'query_id' });
+
+// User → QueryReplies
+User.hasMany(QueryReply, { foreignKey: 'sender_id' });
+QueryReply.belongsTo(User, { foreignKey: 'sender_id' });
 
 export {
   sequelize,
@@ -59,5 +73,7 @@ export {
   Booking,
   BookingItem,
   Payment,
-  Ticket
+  Ticket,
+  Query,
+  QueryReply
 };
