@@ -6,6 +6,8 @@ import Announcement from './Announcement.js';
 import Seat from './Seat.js';
 import Booking from './Booking.js';
 import BookingItem from './BookingItem.js';
+import Payment from './Payment.js';
+import Ticket from './Ticket.js';
 
 // ============================================================
 // ASSOCIATIONS
@@ -35,6 +37,14 @@ BookingItem.belongsTo(Booking, { foreignKey: 'booking_id' });
 Seat.hasMany(BookingItem, { foreignKey: 'seat_id' });
 BookingItem.belongsTo(Seat, { foreignKey: 'seat_id' });
 
+// Booking → Payment
+Booking.hasOne(Payment, { foreignKey: 'booking_id' });
+Payment.belongsTo(Booking, { foreignKey: 'booking_id' });
+
+// Booking → Ticket
+Booking.hasOne(Ticket, { foreignKey: 'booking_id' });
+Ticket.belongsTo(Booking, { foreignKey: 'booking_id' });
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -47,5 +57,7 @@ export {
   Announcement,
   Seat,
   Booking,
-  BookingItem
+  BookingItem,
+  Payment,
+  Ticket
 };

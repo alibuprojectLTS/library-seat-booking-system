@@ -4,12 +4,12 @@
   "description": "Library Seat Booking System - Backend API",
   "main": "src/index.js",
   "scripts": {
-  "start": "node src/index.js",
-  "dev": "nodemon src/index.js",
-  "swagger": "node src/swagger.js",
-  "dev:swagger": "node src/swagger.js && npm run dev",
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "swagger": "node src/swagger.js",
+    "dev:swagger": "node src/swagger.js && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [
     "library",
     "booking",
@@ -21,6 +21,7 @@
   "type": "module",
   "dependencies": {
     "@romatech/swagger": "^2.0.0",
+    "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
@@ -34,6 +35,7 @@
     "nodemailer": "^10.0.0",
     "pg": "^8.23.0",
     "pg-hstore": "^2.3.4",
+    "qrcode": "^1.5.4",
     "sequelize": "^6.37.8",
     "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.3.0",

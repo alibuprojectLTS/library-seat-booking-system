@@ -4,6 +4,7 @@ import statusRoutes from './statusRoutes.js';
 import seatRoutes from './seatRoutes.js';
 import announcementRoutes from './announcementRoutes.js';
 import bookingRoutes from './bookingRoutes.js';
+import paymentRoutes from './paymentRoutes.js';
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.use('/announcements', announcementRoutes);
 
 // Protected routes
 router.use('/bookings', bookingRoutes);
+router.use('/payments', paymentRoutes);
 
 export default router;
