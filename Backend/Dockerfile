@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (production only)
+RUN npm ci --omit=dev
 
 # Copy source code
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 5000
 
 # Start the application
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
