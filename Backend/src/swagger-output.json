@@ -27,6 +27,7 @@
   "paths": {
     "/auth/register": {
       "post": {
+        "tags": ["Authentication"],
         "description": "Register a new user",
         "parameters": [
           {
@@ -54,6 +55,7 @@
     },
     "/auth/login": {
       "post": {
+        "tags": ["Authentication"],
         "description": "Login user",
         "parameters": [
           {
@@ -79,6 +81,7 @@
     },
     "/auth/me": {
       "get": {
+        "tags": ["Authentication"],
         "description": "Get current user profile",
         "responses": {
           "200": { "description": "OK" },
@@ -90,6 +93,7 @@
     },
     "/status/": {
       "get": {
+        "tags": ["Library Status"],
         "description": "Get library status",
         "responses": {
           "200": { "description": "OK" },
@@ -99,6 +103,7 @@
     },
     "/seats/sections": {
       "get": {
+        "tags": ["Seats"],
         "description": "Get all library sections",
         "responses": {
           "200": { "description": "OK" },
@@ -108,14 +113,10 @@
     },
     "/seats/sections/{id}/seats": {
       "get": {
+        "tags": ["Seats"],
         "description": "Get seats by section",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -126,6 +127,7 @@
     },
     "/seats/status": {
       "get": {
+        "tags": ["Seats"],
         "description": "Get real-time seat availability",
         "responses": {
           "200": { "description": "OK" },
@@ -136,6 +138,7 @@
     },
     "/announcements/": {
       "get": {
+        "tags": ["Announcements"],
         "description": "Get active announcements",
         "responses": {
           "200": { "description": "OK" },
@@ -145,6 +148,7 @@
     },
     "/bookings/": {
       "post": {
+        "tags": ["Bookings"],
         "description": "Create a new booking",
         "parameters": [
           {
@@ -179,6 +183,7 @@
     },
     "/bookings/my": {
       "get": {
+        "tags": ["Bookings"],
         "description": "Get user's bookings",
         "responses": {
           "200": { "description": "OK" },
@@ -189,14 +194,10 @@
     },
     "/bookings/{id}": {
       "get": {
+        "tags": ["Bookings"],
         "description": "Get single booking",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -208,14 +209,10 @@
     },
     "/bookings/{id}/cancel": {
       "delete": {
+        "tags": ["Bookings"],
         "description": "Cancel a booking",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -228,6 +225,7 @@
     },
     "/payments/webhook": {
       "post": {
+        "tags": ["Payments"],
         "description": "PayChangu webhook (POST)",
         "parameters": [
           {
@@ -242,26 +240,20 @@
             }
           }
         ],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       },
       "get": {
+        "tags": ["Payments"],
         "description": "PayChangu webhook (GET)",
         "parameters": [
-          {
-            "name": "tx_ref",
-            "in": "query",
-            "type": "string"
-          }
+          { "name": "tx_ref", "in": "query", "type": "string" }
         ],
-        "responses": {
-          "200": { "description": "OK" }
-        }
+        "responses": { "200": { "description": "OK" } }
       }
     },
     "/payments/initiate": {
       "post": {
+        "tags": ["Payments"],
         "description": "Initiate PayChangu payment",
         "parameters": [
           {
@@ -271,10 +263,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "bookingId": {
-                  "type": "integer",
-                  "example": 1
-                }
+                "bookingId": { "type": "integer", "example": 1 }
               },
               "required": ["bookingId"]
             }
@@ -291,14 +280,10 @@
     },
     "/payments/verify/{txRef}": {
       "get": {
+        "tags": ["Payments"],
         "description": "Verify payment status",
         "parameters": [
-          {
-            "name": "txRef",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "txRef", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -311,10 +296,369 @@
     },
     "/payments/history": {
       "get": {
+        "tags": ["Payments"],
         "description": "Get user's payment history",
         "responses": {
           "200": { "description": "OK" },
           "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/queries/": {
+      "post": {
+        "tags": ["Queries"],
+        "description": "Submit a query",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "subject": { "type": "string", "example": "Payment Issue" },
+                "message": { "type": "string", "example": "I paid but no ticket" },
+                "category": { "type": "string", "example": "payment" },
+                "priority": { "type": "string", "example": "high" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/queries/my": {
+      "get": {
+        "tags": ["Queries"],
+        "description": "Get user's queries",
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/tickets/my": {
+      "get": {
+        "tags": ["Tickets"],
+        "description": "Get user's tickets",
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/tickets/{id}": {
+      "get": {
+        "tags": ["Tickets"],
+        "description": "Get single ticket",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/dashboard": {
+      "get": {
+        "tags": ["Admin"],
+        "description": "Admin dashboard stats",
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/queries": {
+      "get": {
+        "tags": ["Admin"],
+        "description": "Get all queries",
+        "parameters": [
+          { "name": "status", "in": "query", "type": "string" },
+          { "name": "priority", "in": "query", "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/queries/{id}/reply": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Reply to a query",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string", "example": "Resolved" },
+                "status": { "type": "string", "example": "resolved" },
+                "is_internal": { "type": "boolean", "example": false }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/users/inactive": {
+      "delete": {
+        "tags": ["Admin"],
+        "description": "Delete inactive users",
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/announcements": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Post announcement",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string", "example": "Library closes at 5PM" },
+                "content": { "type": "string", "example": "Important update" },
+                "announcement_type": { "type": "string", "example": "urgent" },
+                "priority": { "type": "string", "example": "high" },
+                "is_pinned": { "type": "boolean", "example": true },
+                "expires_at": { "type": "string", "example": "2026-10-01" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/status": {
+      "put": {
+        "tags": ["Admin"],
+        "description": "Update library status",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": { "type": "string", "example": "open" },
+                "capacity_used": { "type": "integer", "example": 30 },
+                "capacity_total": { "type": "integer", "example": 100 },
+                "message": { "type": "string", "example": "Peak hours" },
+                "open_hours": { "type": "string", "example": "8AM-6PM" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/seats": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Add seat manually",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "section_id": { "type": "integer", "example": 5 },
+                "seat_label": { "type": "string", "example": "A6" },
+                "row_number": { "type": "integer", "example": 1 },
+                "column_number": { "type": "integer", "example": 6 },
+                "seat_status": { "type": "string", "example": "available" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/seats/{id}": {
+      "put": {
+        "tags": ["Admin"],
+        "description": "Update seat",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "seat_label": { "type": "string" },
+                "row_number": { "type": "integer" },
+                "column_number": { "type": "integer" },
+                "seat_status": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "description": "Delete seat",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/seats/csv": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Upload seats via CSV",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          { "name": "section_id", "in": "formData", "type": "integer", "required": true },
+          { "name": "file", "in": "formData", "type": "file", "required": true }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/checkin": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Verify QR and check in user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ticket_code": { "type": "string", "example": "TKT-7-MU438U0V-ZLGF" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/checkout": {
+      "post": {
+        "tags": ["Admin"],
+        "description": "Check out user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "booking_id": { "type": "integer", "example": 7 }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/admin/bookings/search": {
+      "get": {
+        "tags": ["Admin"],
+        "description": "Search bookings by seat, occupant, or user",
+        "parameters": [
+          { "name": "seat_label", "in": "query", "type": "string" },
+          { "name": "occupant_name", "in": "query", "type": "string" },
+          { "name": "booking_id", "in": "query", "type": "integer" },
+          { "name": "user_email", "in": "query", "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
           "500": { "description": "Internal Server Error" }
         }
       }
