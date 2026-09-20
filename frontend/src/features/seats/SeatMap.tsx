@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import SectionTabs from './components/SectionTabs';
@@ -40,18 +40,28 @@ const SeatMap: React.FC = () => {
 
   if (loadingSections) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <FontAwesomeIcon icon={faSpinner} className="animate-spin text-5xl text-indigo-600" />
-      </div>
+      <AnimatedBackground>
+        <div className="flex items-center justify-center min-h-screen">
+          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-5xl text-indigo-600" />
+        </div>
+      </AnimatedBackground>
     );
   }
 
   return (
     <AnimatedBackground>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 pb-16">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
+            {/* Back to Dashboard */}
+            <button
+              onClick={() => navigate('/user')}
+              className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-bold text-base transition mb-4"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} /> Back to Dashboard
+            </button>
+
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
               Select Your Seat
             </h1>
@@ -61,7 +71,7 @@ const SeatMap: React.FC = () => {
           </div>
 
           {/* Section Tabs */}
-          <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
             <SectionTabs
               sections={sections}
               activeSection={activeSection}
@@ -76,7 +86,7 @@ const SeatMap: React.FC = () => {
           </div>
 
           {/* Seat Map */}
-          <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
             {activeSectionData && (
               <div className="text-center mb-8">
                 <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
@@ -119,7 +129,7 @@ const SeatMap: React.FC = () => {
           </div>
 
           {/* Selection Summary */}
-          <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <p className="text-base font-bold text-gray-700 uppercase tracking-wide">
                 Selected Seats
