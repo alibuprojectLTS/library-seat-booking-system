@@ -8,11 +8,11 @@ const items = [
 ];
 
 const SeatLegend: React.FC = () => (
-  <div className="flex flex-wrap items-center gap-6 justify-center py-4">
+  <div className="flex flex-wrap items-center gap-8 justify-center py-5">
     {items.map((i) => (
-      <div key={i.label} className="flex items-center gap-2">
-        <span className={`w-6 h-6 rounded-md border ${i.color}`} />
-        <span className="text-sm font-semibold text-gray-700">{i.label}</span>
+      <div key={i.label} className="flex items-center gap-3">
+        <span className={`w-7 h-7 rounded-md border ${i.color}`} />
+        <span className="text-base font-bold text-gray-800">{i.label}</span>
       </div>
     ))}
   </div>
