@@ -37,21 +37,21 @@ const Stats: React.FC = () => {
   }, []);
 
   return (
-    <section className="mx-auto px-4 mt-4">
-      <div className="bg-blue-600 p-6 shadow-lg rounded-lg">
+    <section className="bg-blue-600 text-white">
+      <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <div key={index} className="text-center text-white">
+              <div key={index} className="text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <IconComponent className="w-8 h-8 mr-2" />
+                  <IconComponent className="w-7 h-7 mr-2 text-yellow-300" />
                   <span className="text-3xl font-extrabold">
                     {counts[index]}
                     {stat.suffix}
                   </span>
                 </div>
-                <p className="text-sm font-semibold opacity-90">{stat.label}</p>
+                <p className="text-sm font-semibold text-blue-100">{stat.label}</p>
               </div>
             );
           })}

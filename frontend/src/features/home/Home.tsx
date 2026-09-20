@@ -22,7 +22,7 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-gray-900">
       <Navbar />
       <Hero />
       <Stats />

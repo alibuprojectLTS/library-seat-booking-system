@@ -10,16 +10,22 @@ interface StatusData {
 }
 
 const LibraryStatus: React.FC = () => {
-  const [status, setStatus] = useState<StatusData | null>(null);
+  const [status, setStatus] = useState<StatusData>({
+    current_state: 'open',
+    capacity_used: 0,
+    capacity_total: 170,
+    message: 'Welcome to the National Library Services.',
+    open_hours: '8:00 AM - 6:00 PM',
+  });
 
   useEffect(() => {
     apiClient
       .get('/status')
-      .then(({ data }) => setStatus(data.status))
-      .catch(() => setStatus(null));
+      .then(({ data }) => {
+        if (data.status) setStatus(data.status);
+      })
+      .catch(() => {});
   }, []);
-
-  if (!status) return null;
 
   const isOpen = status.current_state === 'open';
   const occupancy =
@@ -30,7 +36,7 @@ const LibraryStatus: React.FC = () => {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16">
-        <div className="reveal rounded-2xl border border-gray-100 bg-slate-50/60 p-8 md:p-10">
+        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-8 md:p-10">
           <div className="flex items-center gap-3">
             <span
               className={`h-4 w-4 rounded-full ${
@@ -38,32 +44,40 @@ const LibraryStatus: React.FC = () => {
               }`}
             />
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
-              {status.current_state.toUpperCase()}
+              Library is {status.current_state.toUpperCase()}
             </h2>
           </div>
 
-          <p className="mt-4 text-lg text-gray-600 font-medium">{status.message}</p>
+          <p className="mt-4 text-xl font-medium text-gray-600">{status.message}</p>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
-              <p className="text-sm font-bold text-gray-500">CAPACITY</p>
-              <p className="text-3xl font-extrabold text-gray-900 mt-2">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
+              <p className="text-sm font-extrabold text-gray-500 uppercase tracking-wide">
+                Capacity
+              </p>
+              <p className="text-4xl font-extrabold text-gray-900 mt-3">
                 {status.capacity_used}/{status.capacity_total}
               </p>
-              <p className="text-sm text-gray-500 mt-1 font-medium">{occupancy}% occupied</p>
+              <p className="text-base font-semibold text-gray-500 mt-2">
+                {occupancy}% occupied
+              </p>
             </div>
 
-            <div className="rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
-              <p className="text-sm font-bold text-gray-500">OPEN HOURS</p>
-              <p className="text-2xl font-extrabold text-gray-900 mt-2">
+            <div className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
+              <p className="text-sm font-extrabold text-gray-500 uppercase tracking-wide">
+                Open Hours
+              </p>
+              <p className="text-3xl font-extrabold text-gray-900 mt-3">
                 {status.open_hours}
               </p>
             </div>
 
-            <div className="rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
-              <p className="text-sm font-bold text-gray-500">STATUS</p>
-              <p className="text-2xl font-extrabold text-blue-600 mt-2">
-                {isOpen ? 'Accepting' : 'Not Accepting'}
+            <div className="rounded-xl bg-white border border-gray-100 p-6 shadow-sm">
+              <p className="text-sm font-extrabold text-gray-500 uppercase tracking-wide">
+                Status
+              </p>
+              <p className="text-3xl font-extrabold text-blue-600 mt-3">
+                {isOpen ? 'Accepting' : 'Closed'}
               </p>
             </div>
           </div>

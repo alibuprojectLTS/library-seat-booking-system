@@ -14,7 +14,7 @@ interface NavLinkProps {
 const NavLink: React.FC<NavLinkProps> = ({ to, children, className = '' }) => (
   <Link
     to={to}
-    className={`text-gray-600 hover:text-blue-600 transition-colors font-medium border-b-2 border-transparent hover:border-blue-600 ${className}`}
+    className={`text-gray-700 hover:text-blue-600 transition-colors font-bold text-base border-b-2 border-transparent hover:border-blue-600 ${className}`}
   >
     {children}
   </Link>
@@ -63,19 +63,24 @@ const Navbar: React.FC = () => {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
+      <div className="max-w-7xl mx-auto flex justify-between items-center h-20 px-6">
+        {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
-          <div className="w-11 h-11 bg-blue-50 rounded-lg flex items-center justify-center">
-            <FontAwesomeIcon icon={faBook} className="text-blue-900 text-xl" />
+          <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+            <FontAwesomeIcon icon={faBook} className="text-blue-900 text-2xl" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-[10px] font-extrabold tracking-widest" style={{ color: '#C6AA58' }}>
+            <h1
+              className="text-xs font-extrabold tracking-widest"
+              style={{ color: '#C6AA58' }}
+            >
               NATIONAL LIBRARY SERVICES
             </h1>
-            <h1 className="text-lg font-extrabold text-blue-900">LIBRARYSEAT</h1>
+            <h1 className="text-2xl font-extrabold text-blue-900">LIBRARYSEAT</h1>
           </div>
         </Link>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
           {navigationItems.map((item) => (
             <NavLink key={item.name} to={item.path}>
@@ -84,15 +89,19 @@ const Navbar: React.FC = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center gap-4">
           {!user ? (
             <>
-              <Link to="/login" className="text-gray-600 hover:text-blue-600 font-medium transition">
+              <Link
+                to="/login"
+                className="text-gray-700 hover:text-blue-600 font-bold text-base transition"
+              >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="bg-blue-900 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-800 transition shadow-md"
+                className="bg-blue-900 text-white px-6 py-2.5 rounded-full font-bold text-base hover:bg-blue-800 transition shadow-md"
               >
                 Register
               </Link>
@@ -101,51 +110,82 @@ const Navbar: React.FC = () => {
             <>
               <Link
                 to={user.role === 'admin' ? '/admin' : '/user'}
-                className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium transition"
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 font-bold text-base transition"
               >
-                <FontAwesomeIcon icon={faUser} />
+                <FontAwesomeIcon icon={faUser} className="text-lg" />
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="bg-blue-900 text-white px-5 py-2 rounded-full font-semibold hover:bg-blue-800 transition shadow-md flex items-center gap-2"
+                className="bg-blue-900 text-white px-6 py-2.5 rounded-full font-bold text-base hover:bg-blue-800 transition shadow-md flex items-center gap-2"
               >
-                <FontAwesomeIcon icon={faSignOutAlt} />
+                <FontAwesomeIcon icon={faSignOutAlt} className="text-lg" />
                 Logout
               </button>
             </>
           )}
         </div>
 
-        <button onClick={toggleMenu} className="md:hidden text-black hover:text-blue-600 transition">
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {/* Mobile Toggle */}
+        <button
+          onClick={toggleMenu}
+          className="md:hidden text-black hover:text-blue-600 transition"
+        >
+          {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
         </button>
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
-          <div className="px-4 py-4 space-y-3 flex flex-col items-center">
+          <div className="px-4 py-6 space-y-4 flex flex-col items-center">
             {navigationItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
                 onClick={() => setIsMenuOpen(false)}
-                className="text-gray-600 hover:text-blue-600 transition py-2 font-medium"
+                className="text-gray-700 hover:text-blue-600 transition py-2 font-bold text-lg"
               >
                 {item.name}
               </Link>
             ))}
 
-            <div className="pt-3 border-t border-gray-200 w-full flex flex-col items-center space-y-2">
+            <div className="pt-4 border-t border-gray-200 w-full flex flex-col items-center space-y-3">
               {!user ? (
                 <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="text-gray-600 font-medium">Login</Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="bg-blue-900 text-white px-6 py-2 rounded-full font-semibold shadow-md">Register</Link>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-gray-700 font-bold text-lg"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="bg-blue-900 text-white px-8 py-3 rounded-full font-bold text-base shadow-md"
+                  >
+                    Register
+                  </Link>
                 </>
               ) : (
                 <>
-                  <Link to={user.role === 'admin' ? '/admin' : '/user'} onClick={() => setIsMenuOpen(false)} className="text-gray-600 font-medium">Dashboard</Link>
-                  <button onClick={() => { setIsMenuOpen(false); handleLogout(); }} className="bg-blue-900 text-white px-6 py-2 rounded-full font-semibold shadow-md">Logout</button>
+                  <Link
+                    to={user.role === 'admin' ? '/admin' : '/user'}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-gray-700 font-bold text-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="bg-blue-900 text-white px-8 py-3 rounded-full font-bold text-base shadow-md"
+                  >
+                    Logout
+                  </button>
                 </>
               )}
             </div>

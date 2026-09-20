@@ -15,30 +15,22 @@ const steps = [
 ];
 
 const HowToUse: React.FC = () => (
-  <section className="bg-slate-50/60">
-    <div className="mx-auto max-w-7xl px-4 py-16">
-      <div className="text-center max-w-2xl mx-auto reveal">
-        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+  <section className="bg-gray-50">
+    <div className="mx-auto max-w-7xl px-4 py-14">
+      <div className="text-center max-w-2xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
           How to Book a Seat
         </h2>
-        <p className="mt-4 text-lg text-gray-600 font-medium">
+        <p className="mt-3 text-lg text-gray-600 font-medium">
           Four simple steps to secure your spot.
         </p>
       </div>
 
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-        {steps.map((s, idx) => (
+      <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+        {steps.map((s) => (
           <div
             key={s.title}
-            className={`card-hover reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-md text-center ${
-              idx === 1
-                ? 'reveal-delay-1'
-                : idx === 2
-                ? 'reveal-delay-2'
-                : idx === 3
-                ? 'reveal-delay-3'
-                : ''
-            }`}
+            className="card-hover rounded-2xl border border-gray-100 bg-white p-6 shadow-md text-center"
           >
             <div className="mx-auto h-16 w-16 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
               <FontAwesomeIcon icon={s.icon} className="text-blue-600 text-2xl" />
