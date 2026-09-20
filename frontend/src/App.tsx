@@ -15,6 +15,11 @@ import UserTickets from './features/dashboards/user/pages/UserTickets';
 import SeatMap from './features/seats/SeatMap';
 import BookingSummary from './features/bookings/BookingSummary';
 
+// Payment flow
+import PaymentPage from './features/payments/PaymentPage';
+import PaymentSuccess from './features/payments/components/PaymentSuccess';
+import PaymentCancel from './features/payments/components/PaymentCancel';
+
 const App: React.FC = () => (
   <AuthProvider>
     <Toaster
@@ -40,10 +45,12 @@ const App: React.FC = () => (
     />
     <BrowserRouter>
       <Routes>
+        {/* ---------- Public ---------- */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
+        {/* ---------- User Dashboard (Nested) ---------- */}
         <Route
           path="/user"
           element={
@@ -58,6 +65,7 @@ const App: React.FC = () => (
           <Route path="tickets" element={<UserTickets />} />
         </Route>
 
+        {/* ---------- Booking Flow (Protected) ---------- */}
         <Route
           path="/seats"
           element={
@@ -75,6 +83,19 @@ const App: React.FC = () => (
           }
         />
 
+        {/* ---------- Payment Flow ---------- */}
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute role="user">
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />
+
+        {/* ---------- Fallback ---------- */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
