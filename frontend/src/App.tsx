@@ -4,33 +4,65 @@ import { Toaster } from 'react-hot-toast';
 
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
+
+// Public
 import Home from './features/home/Home';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
 import Contact from './features/contact/Contact';
+
+// User Dashboard
 import UserLayout from './features/dashboards/user/UserLayout';
 import UserDashboard from './features/dashboards/user/UserDashboard';
 import UserProfile from './features/dashboards/user/pages/UserProfile';
 import UserBookings from './features/dashboards/user/pages/UserBookings';
 import UserTickets from './features/dashboards/user/pages/UserTickets';
+
+// Booking Flow
 import SeatMap from './features/seats/SeatMap';
 import BookingSummary from './features/bookings/BookingSummary';
+
+// Payment Flow
 import PaymentPage from './features/payments/PaymentPage';
 import PaymentSuccess from './features/payments/components/PaymentSuccess';
 import PaymentCancel from './features/payments/components/PaymentCancel';
 
+// Admin Dashboard
+import AdminLayout from './features/dashboards/admin/AdminLayout';
+import AdminDashboard from './features/dashboards/admin/AdminDashboard';
+
 const App: React.FC = () => (
   <AuthProvider>
-    <Toaster position="top-right" />
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+        style: {
+          background: '#fff',
+          color: '#1e293b',
+          border: '1px solid #e2e8f0',
+          fontSize: '15px',
+          fontWeight: '600',
+          borderRadius: '10px',
+          padding: '12px 16px',
+        },
+        success: {
+          iconTheme: { primary: '#10b981', secondary: '#fff' },
+        },
+        error: {
+          iconTheme: { primary: '#ef4444', secondary: '#fff' },
+        },
+      }}
+    />
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* ---------- Public ---------- */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
 
-        {/* User Dashboard */}
+        {/* ---------- User Dashboard (Nested) ---------- */}
         <Route
           path="/user"
           element={
@@ -45,7 +77,7 @@ const App: React.FC = () => (
           <Route path="tickets" element={<UserTickets />} />
         </Route>
 
-        {/* Booking */}
+        {/* ---------- Booking Flow (Protected) ---------- */}
         <Route
           path="/seats"
           element={
@@ -63,7 +95,7 @@ const App: React.FC = () => (
           }
         />
 
-        {/* Payment */}
+        {/* ---------- Payment Flow ---------- */}
         <Route
           path="/payment"
           element={
@@ -75,7 +107,19 @@ const App: React.FC = () => (
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/cancel" element={<PaymentCancel />} />
 
-        {/* Fallback */}
+        {/* ---------- Admin Dashboard (Nested) ---------- */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
+
+        {/* ---------- Fallback ---------- */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
