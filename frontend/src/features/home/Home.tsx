@@ -8,6 +8,7 @@ import LibraryStatus from './components/LibraryStatus';
 import HowToUse from './components/HowToUse';
 import LibrarySections from './components/LibrarySections';
 import Newsletter from './components/Newsletter';
+import ContactSection from './components/ContactSection';
 import Partners from './components/Partners';
 
 const Home: React.FC = () => {
@@ -31,6 +32,7 @@ const Home: React.FC = () => {
       <HowToUse />
       <LibrarySections />
       <Newsletter />
+      <ContactSection />     {/* ← NEW: below Newsletter, above Partners */}
       <Partners />
       <Footer />
     </div>
