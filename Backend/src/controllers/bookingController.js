@@ -1,4 +1,4 @@
-import { Booking, BookingItem, Seat } from '../models/index.js';
+import { Booking, BookingItem, Seat, LibrarySection } from '../models/index.js';
 import { sequelize } from '../models/index.js';
 
 export const createBooking = async (req, res) => {
@@ -45,7 +45,7 @@ export const createBooking = async (req, res) => {
       }
     }
 
-    // Calculate total amount (default 200 per seat)
+    // Calculate total amount
     const totalAmount = seats.length * 200;
 
     // Create booking
@@ -104,7 +104,17 @@ export const getMyBookings = async (req, res) => {
       include: [
         {
           model: BookingItem,
-          include: [Seat]
+          include: [
+            {
+              model: Seat,
+              include: [
+                {
+                  model: LibrarySection,
+                  attributes: ['section_id', 'section_name']
+                }
+              ]
+            }
+          ]
         }
       ],
       order: [['created_at', 'DESC']]
@@ -133,7 +143,17 @@ export const getBookingById = async (req, res) => {
       include: [
         {
           model: BookingItem,
-          include: [Seat]
+          include: [
+            {
+              model: Seat,
+              include: [
+                {
+                  model: LibrarySection,
+                  attributes: ['section_id', 'section_name']
+                }
+              ]
+            }
+          ]
         }
       ]
     });
