@@ -6,7 +6,6 @@ import {
   faBell,
   faChevronDown,
   faUser,
-  faCog,
   faRightFromBracket,
   faLandmark,
 } from '@fortawesome/free-solid-svg-icons';

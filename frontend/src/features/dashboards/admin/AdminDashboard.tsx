@@ -5,7 +5,6 @@ import {
   faChair,
   faUsers,
   faCalendarCheck,
-  faWallet,
   faComments,
   faBullhorn,
   faArrowRight,

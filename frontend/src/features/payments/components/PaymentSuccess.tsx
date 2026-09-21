@@ -5,7 +5,6 @@ import {
   faCheckCircle,
   faTicket,
   faHome,
-  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 
