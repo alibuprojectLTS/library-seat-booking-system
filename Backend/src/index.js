@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════
-// Swagger Documentation (Dynamic Host)
+// Swagger Documentation (Dynamic Host + HTTPS in Prod)
 // ═══════════════════════════════════════════════════════════
 app.use(
   '/api-docs',
@@ -45,7 +45,14 @@ app.use(
 
     // Use the actual host from the incoming request
     dynamicSwagger.host = req.get('host');
-    dynamicSwagger.schemes = [req.protocol];
+
+    // Force HTTPS in production (Render, Heroku, etc.)
+    const isProduction =
+      process.env.NODE_ENV === 'production' ||
+      req.get('host')?.includes('onrender.com') ||
+      req.get('x-forwarded-proto') === 'https';
+
+    dynamicSwagger.schemes = [isProduction ? 'https' : 'http'];
 
     swaggerUi.setup(dynamicSwagger)(req, res, next);
   }
