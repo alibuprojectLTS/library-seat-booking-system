@@ -11,7 +11,7 @@ import routes from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const require = createRequire(import.meta.url);
-const swaggerFile = require('./swagger-output.json');
+const swaggerDocument = require('./swagger-output.json');
 
 dotenv.config();
 
@@ -27,16 +27,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // ═══════════════════════════════════════════════════════════
-// ROOT ROUTE — Redirect to Swagger Docs
+// ROOT ROUTE — Redirect to Swagger
 // ═══════════════════════════════════════════════════════════
 app.get('/', (req, res) => {
   res.redirect('/api-docs/');
 });
 
 // ═══════════════════════════════════════════════════════════
-// Swagger Documentation
+// Swagger Documentation (Dynamic Host)
 // ═══════════════════════════════════════════════════════════
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  (req, res, next) => {
+    // Clone swagger doc so we don't mutate the original
+    const dynamicSwagger = { ...swaggerDocument };
+
+    // Use the actual host from the incoming request
+    dynamicSwagger.host = req.get('host');
+    dynamicSwagger.schemes = [req.protocol];
+
+    swaggerUi.setup(dynamicSwagger)(req, res, next);
+  }
+);
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -59,9 +72,6 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
-
-    // Tables already exist on Neon — do NOT alter
-    // await sequelize.sync({ alter: true });
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
