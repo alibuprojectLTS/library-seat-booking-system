@@ -9,4 +9,3 @@ uploads
 .vscode
 .idea
 coverage
-swagger-output.json

@@ -26,7 +26,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Swagger Documentation (auto-generated)
+// ═══════════════════════════════════════════════════════════
+// ROOT ROUTE — Redirect to Swagger Docs
+// ═══════════════════════════════════════════════════════════
+app.get('/', (req, res) => {
+  res.redirect('/api-docs/');
+});
+
+// ═══════════════════════════════════════════════════════════
+// Swagger Documentation
+// ═══════════════════════════════════════════════════════════
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Health Check
@@ -51,9 +60,8 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
 
-    // ⚠️ Tables already exist on Neon — do NOT alter them
+    // Tables already exist on Neon — do NOT alter
     // await sequelize.sync({ alter: true });
-    // console.log('✅ Database synced');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
