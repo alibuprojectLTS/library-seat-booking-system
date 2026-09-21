@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (production only)
-RUN npm ci --omit=dev
+# Install ALL dependencies (nodemon needed for start script fallback)
+RUN npm install
 
 # Copy source code
 COPY . .

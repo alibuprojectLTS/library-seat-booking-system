@@ -51,8 +51,9 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
 
-    await sequelize.sync({ alter: true });
-    console.log('✅ Database synced');
+    // ⚠️ Tables already exist on Neon — do NOT alter them
+    // await sequelize.sync({ alter: true });
+    // console.log('✅ Database synced');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

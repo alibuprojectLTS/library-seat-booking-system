@@ -1,0 +1,12 @@
+node_modules
+.env
+.env.local
+.git
+.gitignore
+logs
+uploads
+*.log
+.vscode
+.idea
+coverage
+swagger-output.json
