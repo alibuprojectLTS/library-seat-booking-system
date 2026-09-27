@@ -17,6 +17,7 @@ class PaymentService {
       const callbackUrl = `${process.env.API_URL}/api/payments/webhook`;
 
       console.log('🔗 Callback URL:', callbackUrl);
+      console.log('🔗 Return URL:', redirectUrl);
       console.log('🔗 API URL:', PAYCHANGU_API_URL);
 
       const response = await axios.post(
@@ -28,7 +29,7 @@ class PaymentService {
           customer_name: `User ${userId}`,
           customer_email: `user${userId}@library.com`,
           description: description,
-          redirect_url: redirectUrl,
+          return_url: redirectUrl,        // ✅ FIXED: was redirect_url
           cancel_url: cancelUrl,
           callback_url: callbackUrl
         },
@@ -45,7 +46,7 @@ class PaymentService {
 
       if (response.data.status === 'success') {
         // ✅ Save BOTH refs — use ours for querying, but store PayChangu's for webhook matching
-     const paychanguTxRef = response.data.data?.data?.tx_ref || txRef;
+        const paychanguTxRef = response.data.data?.data?.tx_ref || txRef;
         return {
           success: true,
           checkoutUrl: response.data.data.checkout_url,
@@ -112,4 +113,4 @@ class PaymentService {
   }
 }
 
-export default PaymentService;
+export default PaymentService
