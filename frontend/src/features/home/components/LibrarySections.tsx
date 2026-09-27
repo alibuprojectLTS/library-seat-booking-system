@@ -80,7 +80,7 @@ const LibrarySections: React.FC = () => {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16">
-        <div className="text-center max-w-2xl mx-auto reveal">
+        <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
             Library Sections
           </h2>
@@ -90,15 +90,13 @@ const LibrarySections: React.FC = () => {
         </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {sections.map((s, idx) => {
+          {sections.map((s) => {
             const meta = SECTION_META[s.section_name] || FALLBACK_META;
 
             return (
               <div
                 key={s.section_id}
-                className={`card-hover reveal rounded-2xl border border-gray-100 bg-white p-6 shadow-md ${
-                  idx === 1 ? 'reveal-delay-2' : idx === 2 ? 'reveal-delay-3' : ''
-                }`}
+                className="card-hover rounded-2xl border border-gray-100 bg-white p-6 shadow-md"
               >
                 <div
                   className={`h-14 w-14 rounded-xl ${meta.bg} flex items-center justify-center border ${meta.border}`}
