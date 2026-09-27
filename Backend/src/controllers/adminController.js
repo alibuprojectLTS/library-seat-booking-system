@@ -10,10 +10,27 @@ export const getDashboardStats = async (req, res) => {
     const totalSeats = await Seat.count();
     const availableSeats = await Seat.count({ where: { seat_status: 'available' } });
     const bookedSeats = await Seat.count({ where: { seat_status: 'booked' } });
-    const totalBookings = await Booking.count();
+
+    // ✅ Total bookings = only PAID
+    const totalBookings = await Booking.count({
+      where: { booking_status: 'paid' }
+    });
+
+    // ✅ Total revenue = sum of paid bookings
+    const revenueResult = await Booking.sum('total_amount', {
+      where: { booking_status: 'paid' }
+    });
+    const totalRevenue = Number(revenueResult) || 0;
+
     const pendingQueries = await Query.count({ where: { status: 'pending' } });
+
     const today = new Date().toISOString().split('T')[0];
-    const todayBookings = await Booking.count({ where: { booking_date: today } });
+    const todayBookings = await Booking.count({
+      where: {
+        booking_date: today,
+        booking_status: 'paid'
+      }
+    });
 
     const inactiveThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const inactiveUsers = await User.count({
@@ -33,7 +50,8 @@ export const getDashboardStats = async (req, res) => {
         totalBookings,
         todayBookings,
         pendingQueries,
-        inactiveUsers
+        inactiveUsers,
+        totalRevenue,
       }
     });
   } catch (error) {
