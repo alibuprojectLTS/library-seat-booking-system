@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Users, MapPin, Award, BookOpen } from 'lucide-react';
+import apiClient from '../../../api/core/apiClient';
 
 interface StatItem {
   icon: React.FC<{ className?: string }>;
@@ -9,20 +10,42 @@ interface StatItem {
 }
 
 const Stats: React.FC = () => {
-  const stats: StatItem[] = [
-    { icon: Users, number: 170, label: 'Total Seats', suffix: '+' },
-    { icon: MapPin, number: 3, label: 'Library Sections', suffix: '' },
-    { icon: Award, number: 500, label: 'Bookings Made', suffix: '+' },
+  const [stats, setStats] = useState<StatItem[]>([
+    { icon: Users, number: 0, label: 'Total Seats', suffix: '+' },
+    { icon: MapPin, number: 0, label: 'Library Sections', suffix: '' },
+    { icon: Award, number: 0, label: 'Bookings Made', suffix: '+' },
     { icon: BookOpen, number: 24, label: 'Hours Weekly', suffix: '' },
-  ];
+  ]);
 
-  const [counts, setCounts] = useState(stats.map(() => 0));
+  const [counts, setCounts] = useState([0, 0, 0, 0]);
 
+  // Fetch real stats
   useEffect(() => {
+    apiClient
+      .get('/status/stats')
+      .then(({ data }) => {
+        if (!data?.stats) return;
+        const { totalSeats, totalSections, totalBookings, hoursWeekly } = data.stats;
+
+        setStats([
+          { icon: Users, number: totalSeats ?? 0, label: 'Total Seats', suffix: '+' },
+          { icon: MapPin, number: totalSections ?? 0, label: 'Library Sections', suffix: '' },
+          { icon: Award, number: totalBookings ?? 0, label: 'Bookings Made', suffix: '+' },
+          { icon: BookOpen, number: hoursWeekly ?? 24, label: 'Hours Weekly', suffix: '' },
+        ]);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Animate counters when stats update
+  useEffect(() => {
+    const timers: ReturnType<typeof setInterval>[] = [];
+    setCounts(stats.map(() => 0));
+
     stats.forEach((stat, index) => {
       let start = 0;
       const end = stat.number;
-      const stepTime = Math.max(Math.floor(2000 / end), 20);
+      const stepTime = Math.max(Math.floor(1500 / Math.max(end, 1)), 15);
 
       const timer = setInterval(() => {
         start += 1;
@@ -33,8 +56,12 @@ const Stats: React.FC = () => {
         });
         if (start >= end) clearInterval(timer);
       }, stepTime);
+
+      timers.push(timer);
     });
-  }, []);
+
+    return () => timers.forEach(clearInterval);
+  }, [stats]);
 
   return (
     <section className="bg-blue-600 text-white">
