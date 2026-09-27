@@ -5,7 +5,8 @@ export interface QueryReply {
   query_id: number;
   message: string;
   is_internal?: boolean;
-  created_at: string;
+  created_at?: string;
+  createdAt?: string;
   User?: {
     first_name: string;
     last_name: string;
@@ -21,8 +22,10 @@ export interface Query {
   category: string;
   priority: 'low' | 'normal' | 'high' | 'urgent';
   status: 'pending' | 'in_progress' | 'resolved' | 'closed';
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
   QueryReplies?: QueryReply[];
 }
 
@@ -41,4 +44,8 @@ export const submitQuery = async (payload: CreateQueryPayload): Promise<Query> =
 export const getMyQueries = async (): Promise<Query[]> => {
   const { data } = await apiClient.get('/queries/my');
   return data.queries || [];
+};
+
+export const deleteQuery = async (id: number): Promise<void> => {
+  await apiClient.delete(`/queries/${id}`);
 };

@@ -70,3 +70,39 @@ export const getMyQueries = async (req, res) => {
     });
   }
 };
+
+/**
+ * Delete a query (hard delete)
+ */
+export const deleteQuery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const query = await Query.findOne({
+      where: { query_id: id, user_id: userId }
+    });
+
+    if (!query) {
+      return res.status(404).json({
+        success: false,
+        message: 'Query not found'
+      });
+    }
+
+    // Delete all replies first (or rely on cascade)
+    await QueryReply.destroy({ where: { query_id: id } });
+    await query.destroy();
+
+    res.json({
+      success: true,
+      message: 'Query deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete query error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete query'
+    });
+  }
+};

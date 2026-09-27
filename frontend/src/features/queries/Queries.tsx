@@ -8,10 +8,9 @@ import {
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
-import { submitQuery, getMyQueries, type Query } from '../../api/queries/queryApi';
+import { submitQuery, getMyQueries, deleteQuery, type Query } from '../../api/queries/queryApi';
 import QueryCard from './components/QueryCard';
 
-// ✅ MATCHES BACKEND MODEL
 const CATEGORIES = [
   { value: 'general', label: 'General' },
   { value: 'booking', label: 'Booking' },
@@ -84,6 +83,16 @@ const Queries: React.FC = () => {
       toast.error(err.response?.data?.message || 'Failed to submit query');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteQuery(id);
+      toast.success('Query deleted');
+      setQueries((prev) => prev.filter((q) => q.query_id !== id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to delete query');
     }
   };
 
@@ -261,7 +270,11 @@ const Queries: React.FC = () => {
         ) : (
           <div className="space-y-3">
             {filtered.map((q) => (
-              <QueryCard key={q.query_id} query={q} />
+              <QueryCard
+                key={q.query_id}
+                query={q}
+                onDelete={() => handleDelete(q.query_id)}
+              />
             ))}
           </div>
         )}

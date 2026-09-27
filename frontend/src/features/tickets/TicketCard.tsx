@@ -5,6 +5,7 @@ import {
   faTrash,
   faExclamationTriangle,
   faTimes,
+  faClock,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
@@ -14,12 +15,29 @@ interface Ticket {
   valid_date: string;
   is_valid: boolean;
   qr_code_data?: string;
+  created_at?: string;
+  createdAt?: string;
 }
 
 interface Props {
   ticket: Ticket;
   onDelete?: () => void;
 }
+
+// Robust date formatter — handles created_at OR createdAt
+const formatIssued = (t: Ticket): string => {
+  const raw = t.created_at || t.createdAt;
+  if (!raw) return 'Unknown';
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return 'Unknown';
+  return d.toLocaleString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 
 const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
@@ -56,6 +74,7 @@ const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
             <p className="text-xl font-bold text-indigo-700 mt-1">
               {ticket.ticket_code}
             </p>
+
             <p className="text-sm text-gray-600 mt-2 font-medium">
               Valid:{' '}
               {new Date(ticket.valid_date).toLocaleDateString('en-US', {
@@ -63,6 +82,12 @@ const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
                 month: 'long',
                 year: 'numeric',
               })}
+            </p>
+
+            {/* ✅ Issued timestamp */}
+            <p className="text-xs text-gray-500 mt-1 font-medium inline-flex items-center gap-1">
+              <FontAwesomeIcon icon={faClock} className="size-3" />
+              Issued: {formatIssued(ticket)}
             </p>
           </div>
 
