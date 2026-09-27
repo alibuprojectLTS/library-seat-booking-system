@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faTicket, faEye, faEyeSlash, faBroom } from '@fortawesome/free-solid-svg-icons';
-import toast from 'react-hot-toast';
+import { faSpinner, faTicket } from '@fortawesome/free-solid-svg-icons';
 import apiClient from '../../../../api/core/apiClient';
 import TicketCard from '../../../tickets/TicketCard';
 
@@ -13,25 +12,24 @@ interface Ticket {
   qr_code_data?: string;
 }
 
-const HIDDEN_KEY = 'hidden_tickets';
+const DELETED_KEY = 'deleted_tickets';
 
-const getHiddenIds = (): number[] => {
+const getDeletedIds = (): number[] => {
   try {
-    return JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]');
+    return JSON.parse(localStorage.getItem(DELETED_KEY) || '[]');
   } catch {
     return [];
   }
 };
 
-const saveHiddenIds = (ids: number[]) => {
-  localStorage.setItem(HIDDEN_KEY, JSON.stringify(ids));
+const saveDeletedIds = (ids: number[]) => {
+  localStorage.setItem(DELETED_KEY, JSON.stringify(ids));
 };
 
 const UserTickets: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCleared, setShowCleared] = useState(false);
-  const [hiddenIds, setHiddenIds] = useState<number[]>(getHiddenIds());
+  const [deletedIds, setDeletedIds] = useState<number[]>(getDeletedIds());
 
   useEffect(() => {
     apiClient
@@ -41,48 +39,28 @@ const UserTickets: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const hideTicket = (id: number) => {
-    const next = [...hiddenIds, id];
-    saveHiddenIds(next);
-    setHiddenIds(next);
-    toast.success('Ticket cleared');
+  // Delete a ticket → hidden forever
+  const deleteTicket = (id: number) => {
+    const next = [...deletedIds, id];
+    saveDeletedIds(next);
+    setDeletedIds(next);
   };
 
-  const unhideTicket = (id: number) => {
-    const next = hiddenIds.filter((x) => x !== id);
-    saveHiddenIds(next);
-    setHiddenIds(next);
-    toast.success('Ticket restored');
-  };
+  // ✅ Auto-hide: tickets older than 2 days (past valid_date + 2 days)
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 2);
+  cutoff.setHours(0, 0, 0, 0);
 
-  const clearOld = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const oldIds = tickets
-      .filter((t) => t.valid_date < today)
-      .map((t) => t.ticket_id);
+  const visibleTickets = tickets.filter((t) => {
+    if (!t.is_valid) return false;
+    if (deletedIds.includes(t.ticket_id)) return false;
 
-    if (oldIds.length === 0) {
-      toast('No old tickets to clear', { icon: 'ℹ️' });
-      return;
-    }
+    const validDate = new Date(t.valid_date);
+    validDate.setHours(0, 0, 0, 0);
 
-    if (!confirm(`Clear ${oldIds.length} old ticket(s) from view? They stay in the system.`)) {
-      return;
-    }
-
-    const next = Array.from(new Set([...hiddenIds, ...oldIds]));
-    saveHiddenIds(next);
-    setHiddenIds(next);
-    toast.success(`${oldIds.length} old ticket(s) cleared`);
-  };
-
-  // Valid tickets only
-  const validTickets = tickets.filter((t) => t.is_valid);
-
-  // Apply hidden filter (unless showing cleared)
-  const visibleTickets = showCleared
-    ? validTickets
-    : validTickets.filter((t) => !hiddenIds.includes(t.ticket_id));
+    // Show only if valid_date is newer than (today - 2 days)
+    return validDate >= cutoff;
+  });
 
   if (loading) {
     return (
@@ -96,30 +74,11 @@ const UserTickets: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-wrap justify-between items-center gap-3">
+        <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">My Tickets</h1>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCleared((v) => !v)}
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition"
-            >
-              <FontAwesomeIcon icon={showCleared ? faEyeSlash : faEye} className="size-4" />
-              {showCleared ? 'Hide cleared' : 'Show cleared'}
-            </button>
-
-            <button
-              onClick={clearOld}
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition"
-            >
-              <FontAwesomeIcon icon={faBroom} className="size-4" />
-              Clear old
-            </button>
-
-            <span className="text-sm text-gray-500 font-medium">
-              {visibleTickets.length} active
-            </span>
-          </div>
+          <span className="text-sm text-gray-500 font-medium">
+            {visibleTickets.length} active
+          </span>
         </div>
 
         {/* Empty state */}
@@ -130,18 +89,13 @@ const UserTickets: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {visibleTickets.map((t) => {
-              const isCleared = hiddenIds.includes(t.ticket_id);
-              return (
-                <TicketCard
-                  key={t.ticket_id}
-                  ticket={t}
-                  isCleared={isCleared}
-                  onHide={() => hideTicket(t.ticket_id)}
-                  onUnhide={() => unhideTicket(t.ticket_id)}
-                />
-              );
-            })}
+            {visibleTickets.map((t) => (
+              <TicketCard
+                key={t.ticket_id}
+                ticket={t}
+                onDelete={() => deleteTicket(t.ticket_id)}
+              />
+            ))}
           </div>
         )}
       </div>

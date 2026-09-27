@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faTrash, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
 interface Ticket {
@@ -13,12 +13,10 @@ interface Ticket {
 
 interface Props {
   ticket: Ticket;
-  isCleared?: boolean;
-  onHide?: () => void;
-  onUnhide?: () => void;
+  onDelete?: () => void;
 }
 
-const TicketCard: React.FC<Props> = ({ ticket, isCleared, onHide, onUnhide }) => {
+const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
   const handleDownload = () => {
     if (!ticket.qr_code_data) {
       toast.error('No QR code available');
@@ -34,12 +32,15 @@ const TicketCard: React.FC<Props> = ({ ticket, isCleared, onHide, onUnhide }) =>
     toast.success('QR code downloaded!');
   };
 
+  const handleDelete = () => {
+    if (!onDelete) return;
+    if (!confirm('Delete this ticket? It cannot be restored.')) return;
+    onDelete();
+    toast.success('Ticket deleted');
+  };
+
   return (
-    <div
-      className={`bg-white rounded-lg shadow border p-5 hover:shadow-md transition ${
-        isCleared ? 'border-gray-100 opacity-60' : 'border-gray-200'
-      }`}
-    >
+    <div className="bg-white rounded-lg shadow border border-gray-200 p-5 hover:shadow-md transition">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -59,14 +60,8 @@ const TicketCard: React.FC<Props> = ({ ticket, isCleared, onHide, onUnhide }) =>
           </p>
         </div>
 
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-            isCleared
-              ? 'bg-gray-100 text-gray-500'
-              : 'bg-emerald-100 text-emerald-700'
-          }`}
-        >
-          {isCleared ? 'Cleared' : 'Valid'}
+        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-700">
+          Valid
         </span>
       </div>
 
@@ -91,25 +86,15 @@ const TicketCard: React.FC<Props> = ({ ticket, isCleared, onHide, onUnhide }) =>
               Download
             </button>
 
-            {isCleared && onUnhide && (
+            {onDelete && (
               <button
-                onClick={onUnhide}
-                className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-md text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition"
-              >
-                <FontAwesomeIcon icon={faUndo} className="size-4" />
-                Restore
-              </button>
-            )}
-
-            {!isCleared && onHide && (
-              <button
-                onClick={onHide}
+                onClick={handleDelete}
                 className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-md text-sm font-semibold border border-red-200 bg-white text-red-600 hover:bg-red-50 transition"
               >
                 <FontAwesomeIcon icon={faTrash} className="size-4" />
-                Clear
+                Delete
               </button>
-        )}
+            )}
           </div>
         </>
       )}
