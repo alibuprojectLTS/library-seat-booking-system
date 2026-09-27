@@ -1,8 +1,20 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  },
+  // ✅ Add timeouts so it doesn't hang forever
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 20000,
+});
 
 export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
   try {
@@ -10,7 +22,7 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #1e40af;">📚 Booking Confirmation</h1>
+        <h1 style="color: #1e40af;"> Booking Confirmation</h1>
         <p>Hello ${user.first_name},</p>
         <p>Your booking has been confirmed!</p>
 
@@ -31,21 +43,18 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
         </div>
 
         <p>Thank you for using Library Seat Booking System!</p>
-        <p style="color: #6b7280; font-size: 12px;">This is an automated message. Please do not reply.</p>
       </div>
     `;
 
-    const { data, error } = await resend.emails.send({
-      from: 'Library Seat Booking <onboarding@resend.dev>',
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to: user.email,
-      subject: `✅ Booking Confirmation #${booking.booking_id}`,
-      html,
+      subject: ` Booking Confirmation #${booking.booking_id}`,
+      html
     });
 
-    if (error) throw new Error(error.message);
-
-    console.log('✅ Email sent:', data.id);
-    return { success: true, id: data.id };
+    console.log(' Email sent:', info.messageId);
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
@@ -54,17 +63,14 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
 
 export const sendEmail = async ({ to, subject, html, text }) => {
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Library Seat Booking <onboarding@resend.dev>',
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
       to,
       subject,
       html,
-      text,
+      text
     });
-
-    if (error) throw new Error(error.message);
-    console.log('✅ Email sent:', data.id);
-    return { success: true, id: data.id };
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
