@@ -18,7 +18,7 @@ import UserProfile from './features/dashboards/user/pages/UserProfile';
 import UserBookings from './features/dashboards/user/pages/UserBookings';
 import UserTickets from './features/dashboards/user/pages/UserTickets';
 
-// ✅ Support / Queries
+// Support / Queries
 import Queries from './features/queries/Queries';
 
 // Booking Flow
@@ -34,11 +34,11 @@ import PaymentCancel from './features/payments/components/PaymentCancel';
 import AdminLayout from './features/dashboards/admin/AdminLayout';
 import AdminDashboard from './features/dashboards/admin/AdminDashboard';
 
-// ✅ Admin Pages
+// Admin Pages
 import ManageSeats from './features/dashboards/admin/pages/ManageSeats';
 import CSVUpload from './features/dashboards/admin/pages/CSVUpload';
 import Announcements from './features/dashboards/admin/pages/Announcements';
-//import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
+import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
 
 const App: React.FC = () => (
   <AuthProvider>
@@ -128,11 +128,10 @@ const App: React.FC = () => (
         >
           <Route index element={<AdminDashboard />} />
 
-          {/* ✅ Admin Pages */}
           <Route path="seats" element={<ManageSeats />} />
           <Route path="csv-upload" element={<CSVUpload />} />
           <Route path="announcements" element={<Announcements />} />
-          {/*<Route path="status" element={<LibraryStatus />} />*/}
+          <Route path="status" element={<LibraryStatus />} />
         </Route>
 
         {/* ---------- Fallback ---------- */}
