@@ -8,7 +8,7 @@ const sendViaBrevo = async (emailData) => {
   try {
     const response = await axios.post(BREVO_API_URL, emailData, {
       headers: {
-        'accept': 'application/json',
+        accept: 'application/json',
         'api-key': process.env.BREVO_API_KEY,
         'content-type': 'application/json',
       },
@@ -25,11 +25,15 @@ const sendViaBrevo = async (emailData) => {
 export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
   const seatList = seats.map((s) => s.seat_label).join(', ');
 
+  // Extract base64 from data URL (remove "data:image/png;base64,")
+  const base64Data = ticket.qr_code_data?.split(',')[1];
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1e40af;">📚 Booking Confirmation</h1>
       <p>Hello ${user.first_name},</p>
       <p>Your booking has been confirmed!</p>
+
       <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3>Booking Details</h3>
         <p><strong>Booking ID:</strong> #${booking.booking_id}</p>
@@ -38,12 +42,18 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
         <p><strong>Total Seats:</strong> ${booking.total_seats}</p>
         <p><strong>Total Amount:</strong> MK ${booking.total_amount}</p>
       </div>
+
       <div style="text-align: center; margin: 20px 0;">
         <h3>Your Ticket</h3>
         <p><strong>Ticket Code:</strong> ${ticket.ticket_code}</p>
-        <img src="${ticket.qr_code_data}" alt="QR Code" style="width: 200px; height: 200px;" />
-        <p>Show this QR code at the library entrance</p>
+        <p style="color: #6b7280; font-size: 14px;">
+          📎 Your QR code is attached to this email as a PNG file.
+        </p>
+        <p style="color: #6b7280; font-size: 14px;">
+          Show the QR code at the library entrance for verification.
+        </p>
       </div>
+
       <p>Thank you for using Library Seat Booking System!</p>
     </div>
   `;
@@ -56,6 +66,15 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
       email: process.env.BREVO_SENDER_EMAIL,
     },
     to: [{ email: user.email, name: user.first_name }],
+    // ✅ Attach QR as a PNG file
+    attachment: base64Data
+      ? [
+          {
+            content: base64Data,
+            name: `ticket-${ticket.ticket_code}.png`,
+          },
+        ]
+      : undefined,
   });
 };
 
