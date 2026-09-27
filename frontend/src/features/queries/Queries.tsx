@@ -11,13 +11,13 @@ import toast from 'react-hot-toast';
 import { submitQuery, getMyQueries, type Query } from '../../api/queries/queryApi';
 import QueryCard from './components/QueryCard';
 
+// ✅ MATCHES BACKEND MODEL
 const CATEGORIES = [
   { value: 'general', label: 'General' },
   { value: 'booking', label: 'Booking' },
   { value: 'payment', label: 'Payment' },
-  { value: 'refund', label: 'Refund' },
+  { value: 'seat', label: 'Seat Issue' },
   { value: 'technical', label: 'Technical' },
-  { value: 'other', label: 'Other' },
 ];
 
 const PRIORITIES = [
