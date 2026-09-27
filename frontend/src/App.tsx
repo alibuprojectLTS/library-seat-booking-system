@@ -34,6 +34,10 @@ import PaymentCancel from './features/payments/components/PaymentCancel';
 import AdminLayout from './features/dashboards/admin/AdminLayout';
 import AdminDashboard from './features/dashboards/admin/AdminDashboard';
 
+// ✅ Admin Pages
+import ManageSeats from './features/dashboards/admin/pages/ManageSeats';
+import CSVUpload from './features/dashboards/admin/pages/CSVUpload';
+
 const App: React.FC = () => (
   <AuthProvider>
     <Toaster
@@ -122,6 +126,10 @@ const App: React.FC = () => (
           }
         >
           <Route index element={<AdminDashboard />} />
+
+          {/* ✅ Admin Pages */}
+          <Route path="seats" element={<ManageSeats />} />
+          <Route path="csv-upload" element={<CSVUpload />} />
         </Route>
 
         {/* ---------- Fallback ---------- */}
