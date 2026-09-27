@@ -24,6 +24,9 @@ const UserTickets: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // ✅ Filter only valid tickets
+  const visibleTickets = tickets.filter((t) => t.is_valid);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -39,19 +42,19 @@ const UserTickets: React.FC = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">My Tickets</h1>
           <span className="text-sm text-gray-500 font-medium">
-            {tickets.length} total
+            {visibleTickets.length} active
           </span>
         </div>
 
         {/* Empty state */}
-        {tickets.length === 0 ? (
+        {visibleTickets.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
             <FontAwesomeIcon icon={faTicket} className="text-5xl text-gray-300 mb-4" />
-            <p className="text-gray-500 text-base">No tickets yet</p>
+            <p className="text-gray-500 text-base">No active tickets</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tickets.map((t) => (
+            {visibleTickets.map((t) => (
               <TicketCard key={t.ticket_id} ticket={t} />
             ))}
           </div>

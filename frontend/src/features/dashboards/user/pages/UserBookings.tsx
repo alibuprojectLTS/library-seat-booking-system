@@ -83,6 +83,9 @@ const UserBookings: React.FC = () => {
     return [...new Set(names)].join(', ') || '—';
   };
 
+  // ✅ Filter out cancelled bookings
+  const visibleBookings = bookings.filter((b) => b.booking_status !== 'cancelled');
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -97,18 +100,20 @@ const UserBookings: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">My Bookings</h1>
-          <span className="text-sm text-gray-500 font-medium">{bookings.length} total</span>
+          <span className="text-sm text-gray-500 font-medium">
+            {visibleBookings.length} total
+          </span>
         </div>
 
         {/* Empty */}
-        {bookings.length === 0 ? (
+        {visibleBookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
             <FontAwesomeIcon icon={faCalendarCheck} className="text-5xl text-gray-300 mb-4" />
-            <p className="text-gray-500 text-base font-medium">You have no bookings yet</p>
+            <p className="text-gray-500 text-base font-medium">You have no active bookings</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {bookings.map((b) => (
+            {visibleBookings.map((b) => (
               <div
                 key={b.booking_id}
                 className="bg-white rounded-lg shadow border border-gray-200 p-5 hover:shadow-md transition"
@@ -171,7 +176,7 @@ const UserBookings: React.FC = () => {
                   <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
                     <button
                       onClick={() => setConfirmId(b.booking_id)}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm bg-red-500 text-white hover:bg-red-600 shadow-md hover:shadow-lg transition"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-md font-semibold text-sm bg-red-500 text-white hover:bg-red-600 shadow-xs transition"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                       Cancel Booking
@@ -184,20 +189,15 @@ const UserBookings: React.FC = () => {
         )}
       </div>
 
-      {/* ============================================================
-          Cancel Confirmation Modal
-      ============================================================ */}
+      {/* Cancel Confirmation Modal */}
       {confirmId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => !cancelling && setConfirmId(null)}
           />
 
-          {/* Modal */}
           <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-            {/* Close button */}
             <button
               onClick={() => !cancelling && setConfirmId(null)}
               disabled={cancelling !== null}
@@ -206,27 +206,19 @@ const UserBookings: React.FC = () => {
               <FontAwesomeIcon icon={faTimes} className="text-lg" />
             </button>
 
-            {/* Icon */}
             <div className="pt-8 pb-4 flex justify-center">
               <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                <FontAwesomeIcon
-                  icon={faExclamationTriangle}
-                  className="text-red-600 text-2xl"
-                />
+                <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-600 text-2xl" />
               </div>
             </div>
 
-            {/* Content */}
             <div className="px-6 pb-6 text-center">
-              <h3 className="text-xl font-extrabold text-gray-900">
-                Cancel this booking?
-              </h3>
+              <h3 className="text-xl font-extrabold text-gray-900">Cancel this booking?</h3>
               <p className="text-sm text-gray-600 mt-3 leading-relaxed font-medium">
-                This action cannot be undone. The seats will be released and made
-                available to other users.
+                This action cannot be undone. The seats will be released and made available to
+                other users.
               </p>
 
-              {/* Actions */}
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => setConfirmId(null)}

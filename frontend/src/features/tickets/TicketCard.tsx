@@ -1,8 +1,7 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload  } from '@fortawesome/free-solid-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
-
 
 interface Ticket {
   ticket_id: number;
@@ -17,15 +16,12 @@ interface Props {
 }
 
 const TicketCard: React.FC<Props> = ({ ticket }) => {
-  const qrRef = useRef<HTMLDivElement>(null);
-
   const handleDownload = () => {
     if (!ticket.qr_code_data) {
       toast.error('No QR code available');
       return;
     }
 
-    // Convert base64 data URL to downloadable PNG
     const link = document.createElement('a');
     link.href = ticket.qr_code_data;
     link.download = `${ticket.ticket_code}.png`;
@@ -56,24 +52,15 @@ const TicketCard: React.FC<Props> = ({ ticket }) => {
           </p>
         </div>
 
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-            ticket.is_valid
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-red-100 text-red-700'
-          }`}
-        >
-          {ticket.is_valid ? 'Valid' : 'Expired'}
+        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-700">
+          Valid
         </span>
       </div>
 
       {/* QR Code */}
       {ticket.qr_code_data && (
         <>
-          <div
-            ref={qrRef}
-            className="mt-5 flex justify-center p-4 bg-gray-50 rounded-lg"
-          >
+          <div className="mt-5 flex justify-center p-4 bg-gray-50 rounded-lg">
             <img
               src={ticket.qr_code_data}
               alt="QR Code"
@@ -81,12 +68,12 @@ const TicketCard: React.FC<Props> = ({ ticket }) => {
             />
           </div>
 
-          {/* Download Button */}
+          {/* ✅ Smaller download button (shadcn style) */}
           <button
             onClick={handleDownload}
-            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition shadow-sm"
+            className="mt-4 inline-flex items-center justify-center gap-2 h-9 px-4 w-full rounded-md text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition"
           >
-            <FontAwesomeIcon icon={faDownload} />
+            <FontAwesomeIcon icon={faDownload} className="size-4" />
             Download QR Code
           </button>
         </>
