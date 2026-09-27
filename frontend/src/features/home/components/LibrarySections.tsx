@@ -3,28 +3,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDesktop, faBook, faUsers, faChair } from '@fortawesome/free-solid-svg-icons';
 import { getSections, type Section } from '../../../api/seats/seatApi';
 
-// Map DB section names → icon + color
+// Keys MUST match DB `section_name` exactly
 const SECTION_META: Record<
   string,
-  { icon: any; color: string; bg: string; border: string; text: string }
+  { icon: any; bg: string; border: string; text: string }
 > = {
-  Computer: {
+  'Computer Section': {
     icon: faDesktop,
-    color: 'blue',
     bg: 'bg-blue-50',
     border: 'border-blue-100',
     text: 'text-blue-600',
   },
-  General: {
+  'General Reading': {
     icon: faBook,
-    color: 'emerald',
     bg: 'bg-emerald-50',
     border: 'border-emerald-100',
     text: 'text-emerald-600',
   },
-  Discussion: {
+  'Discussion Rooms': {
     icon: faUsers,
-    color: 'purple',
     bg: 'bg-purple-50',
     border: 'border-purple-100',
     text: 'text-purple-600',
@@ -33,7 +30,6 @@ const SECTION_META: Record<
 
 const FALLBACK_META = {
   icon: faChair,
-  color: 'gray',
   bg: 'bg-gray-50',
   border: 'border-gray-100',
   text: 'text-gray-600',
@@ -50,7 +46,6 @@ const LibrarySections: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Simple skeleton while loading
   if (loading) {
     return (
       <section className="bg-white">
