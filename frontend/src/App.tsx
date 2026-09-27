@@ -37,6 +37,8 @@ import AdminDashboard from './features/dashboards/admin/AdminDashboard';
 // ✅ Admin Pages
 import ManageSeats from './features/dashboards/admin/pages/ManageSeats';
 import CSVUpload from './features/dashboards/admin/pages/CSVUpload';
+import Announcements from './features/dashboards/admin/pages/Announcements';
+//import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
 
 const App: React.FC = () => (
   <AuthProvider>
@@ -82,7 +84,6 @@ const App: React.FC = () => (
           <Route path="profile" element={<UserProfile />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="tickets" element={<UserTickets />} />
-          {/* ✅ Support / Queries */}
           <Route path="queries" element={<Queries />} />
         </Route>
 
@@ -130,6 +131,8 @@ const App: React.FC = () => (
           {/* ✅ Admin Pages */}
           <Route path="seats" element={<ManageSeats />} />
           <Route path="csv-upload" element={<CSVUpload />} />
+          <Route path="announcements" element={<Announcements />} />
+          {/*<Route path="status" element={<LibraryStatus />} />*/}
         </Route>
 
         {/* ---------- Fallback ---------- */}
