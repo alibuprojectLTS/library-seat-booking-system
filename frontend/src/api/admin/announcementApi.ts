@@ -28,15 +28,6 @@ export interface CreateAnnouncementPayload {
   expires_at?: string | null;
 }
 
-// ============ PUBLIC ============
-
-export const getActiveAnnouncements = async (): Promise<Announcement[]> => {
-  const { data } = await apiClient.get('/announcements');
-  return data.announcements || [];
-};
-
-// ============ ADMIN ============
-
 export const getAllAnnouncements = async (): Promise<Announcement[]> => {
   const { data } = await apiClient.get('/admin/announcements');
   return data.announcements || [];
