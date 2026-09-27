@@ -253,13 +253,30 @@ export const webhookHandler = async (req, res) => {
       const ticketCode = QRService.generateTicketCode(booking.booking_id);
       const qrCodeData = await QRService.generateQRCode(ticketCode);
 
-      await Ticket.create({
+      const ticket = await Ticket.create({
         booking_id: booking.booking_id,
         ticket_code: ticketCode,
         valid_date: booking.booking_date,
         is_valid: true,
         qr_code_data: qrCodeData
       });
+
+      // ✅ SEND EMAIL — NEW!
+      try {
+        const user = await User.findByPk(booking.user_id);
+        const bookingItems = await BookingItem.findAll({
+          where: { booking_id: booking.booking_id },
+          include: [Seat]
+        });
+        const seats = bookingItems.map((item) => item.Seat);
+
+        console.log('📧 Attempting to send email to:', user?.email);
+        await sendBookingConfirmation(user, booking, ticket, seats);
+        console.log('✅ Email sent successfully');
+      } catch (emailError) {
+        console.error('❌ Email sending failed:', emailError.message);
+        // Don't fail the webhook — just log
+      }
 
       console.log('✅ Webhook processed successfully:', txRef);
       return res.status(200).json({ status: 'success' });
