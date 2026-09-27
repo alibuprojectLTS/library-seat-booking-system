@@ -35,7 +35,6 @@ export const initiatePayment = async (req, res) => {
       });
     }
 
-    // Find booking
     const booking = await Booking.findOne({
       where: { booking_id: bookingId, user_id: userId }
     });
@@ -261,7 +260,7 @@ export const webhookHandler = async (req, res) => {
         qr_code_data: qrCodeData
       });
 
-      // ✅ SEND EMAIL — NEW!
+      // ✅ SEND EMAIL
       try {
         const user = await User.findByPk(booking.user_id);
         const bookingItems = await BookingItem.findAll({
@@ -271,18 +270,33 @@ export const webhookHandler = async (req, res) => {
         const seats = bookingItems.map((item) => item.Seat);
 
         console.log('📧 Attempting to send email to:', user?.email);
-        await sendBookingConfirmation(user, booking, ticket, seats);
-        console.log('✅ Email sent successfully');
+        const emailResult = await sendBookingConfirmation(user, booking, ticket, seats);
+        if (emailResult.success) {
+          console.log('✅ Email sent successfully');
+        } else {
+          console.error('❌ Email failed:', emailResult.error);
+        }
       } catch (emailError) {
         console.error('❌ Email sending failed:', emailError.message);
-        // Don't fail the webhook — just log
       }
 
       console.log('✅ Webhook processed successfully:', txRef);
+
+      // ✅ NEW: Redirect browser (GET) to frontend success page
+      if (req.method === 'GET') {
+        return res.redirect(`${process.env.FRONTEND_URL}/payment/success`);
+      }
+
       return res.status(200).json({ status: 'success' });
     }
 
     console.log('❌ Webhook verification failed:', txRef);
+
+    // ✅ NEW: Redirect browser (GET) to frontend cancel page on failure
+    if (req.method === 'GET') {
+      return res.redirect(`${process.env.FRONTEND_URL}/payment/cancel`);
+    }
+
     return res.status(200).json({ status: 'failed' });
   } catch (error) {
     console.error('Webhook error:', error);
