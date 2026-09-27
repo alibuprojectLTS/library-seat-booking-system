@@ -26,7 +26,7 @@ const menuItems = [
   { icon: faChair, label: 'Book Seat', path: '/seats' },
   { icon: faTicket, label: 'My Tickets', path: '/user/tickets' },
   { icon: faCalendarCheck, label: 'My Bookings', path: '/user/bookings' },
-  { icon: faCommentDots, label: 'Support', path: '/queries' },
+  { icon: faCommentDots, label: 'Support', path: '/user/queries' }, // ✅ FIXED
   { icon: faUser, label: 'My Profile', path: '/user/profile' },
 ];
 

@@ -18,6 +18,9 @@ import UserProfile from './features/dashboards/user/pages/UserProfile';
 import UserBookings from './features/dashboards/user/pages/UserBookings';
 import UserTickets from './features/dashboards/user/pages/UserTickets';
 
+// ✅ Support / Queries
+import Queries from './features/queries/Queries';
+
 // Booking Flow
 import SeatMap from './features/seats/SeatMap';
 import BookingSummary from './features/bookings/BookingSummary';
@@ -75,6 +78,8 @@ const App: React.FC = () => (
           <Route path="profile" element={<UserProfile />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="tickets" element={<UserTickets />} />
+          {/* ✅ Support / Queries */}
+          <Route path="queries" element={<Queries />} />
         </Route>
 
         {/* ---------- Booking Flow (Protected) ---------- */}
