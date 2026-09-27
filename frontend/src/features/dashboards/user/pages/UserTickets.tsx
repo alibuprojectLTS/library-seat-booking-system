@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faTicket } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 import apiClient from '../../../../api/core/apiClient';
 import TicketCard from '../../../tickets/TicketCard';
 
@@ -12,53 +13,44 @@ interface Ticket {
   qr_code_data?: string;
 }
 
-const DELETED_KEY = 'deleted_tickets';
-
-const getDeletedIds = (): number[] => {
-  try {
-    return JSON.parse(localStorage.getItem(DELETED_KEY) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-const saveDeletedIds = (ids: number[]) => {
-  localStorage.setItem(DELETED_KEY, JSON.stringify(ids));
-};
-
 const UserTickets: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletedIds, setDeletedIds] = useState<number[]>(getDeletedIds());
 
-  useEffect(() => {
-    apiClient
-      .get('/tickets/my')
-      .then((r) => setTickets(r.data.tickets || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Delete a ticket → hidden forever
-  const deleteTicket = (id: number) => {
-    const next = [...deletedIds, id];
-    saveDeletedIds(next);
-    setDeletedIds(next);
+  const fetchTickets = async () => {
+    try {
+      const { data } = await apiClient.get('/tickets/my');
+      setTickets(data.tickets || []);
+    } catch {
+      toast.error('Failed to load tickets');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // ✅ Auto-hide: tickets older than 2 days (past valid_date + 2 days)
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const deleteTicket = async (id: number) => {
+    try {
+      await apiClient.delete(`/tickets/${id}`);
+      toast.success('Ticket deleted');
+      setTickets((prev) => prev.filter((t) => t.ticket_id !== id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to delete');
+    }
+  };
+
+  // Auto-hide tickets older than 2 days
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 2);
   cutoff.setHours(0, 0, 0, 0);
 
   const visibleTickets = tickets.filter((t) => {
     if (!t.is_valid) return false;
-    if (deletedIds.includes(t.ticket_id)) return false;
-
     const validDate = new Date(t.valid_date);
     validDate.setHours(0, 0, 0, 0);
-
-    // Show only if valid_date is newer than (today - 2 days)
     return validDate >= cutoff;
   });
 
@@ -73,7 +65,6 @@ const UserTickets: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">My Tickets</h1>
           <span className="text-sm text-gray-500 font-medium">
@@ -81,7 +72,6 @@ const UserTickets: React.FC = () => {
           </span>
         </div>
 
-        {/* Empty state */}
         {visibleTickets.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
             <FontAwesomeIcon icon={faTicket} className="text-5xl text-gray-300 mb-4" />

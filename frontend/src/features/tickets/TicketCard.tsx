@@ -42,7 +42,6 @@ const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
   const confirmDelete = () => {
     if (onDelete) onDelete();
     setShowModal(false);
-    toast.success('Ticket deleted');
   };
 
   return (
@@ -107,7 +106,7 @@ const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
         )}
       </div>
 
-      {/* ✅ Delete Confirmation Modal */}
+      {/* Custom delete modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
@@ -137,7 +136,7 @@ const TicketCard: React.FC<Props> = ({ ticket, onDelete }) => {
                 Delete this ticket?
               </h3>
               <p className="text-sm text-gray-600 mt-3 leading-relaxed font-medium">
-                This ticket will be removed from your view. It cannot be restored.
+                This action cannot be undone. The ticket will be permanently removed.
               </p>
 
               <div className="mt-6 flex gap-3">
