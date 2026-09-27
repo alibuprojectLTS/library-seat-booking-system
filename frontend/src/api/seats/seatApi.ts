@@ -6,6 +6,7 @@ export interface Section {
   description: string;
   capacity: number;
   price_per_seat: number;
+  actual_seats?: number; 
 }
 
 export interface Seat {

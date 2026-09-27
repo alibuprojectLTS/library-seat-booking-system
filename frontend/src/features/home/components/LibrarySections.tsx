@@ -113,7 +113,7 @@ const LibrarySections: React.FC = () => {
                 </p>
 
                 <div className="mt-5 flex items-center justify-between text-sm font-bold text-gray-500">
-                  <span>{s.capacity} seats</span>
+                  <span>{s.actual_seats ?? s.capacity} seats</span>
                   <span className="text-blue-600">
                     MK {Number(s.price_per_seat).toLocaleString()} / seat
                   </span>
