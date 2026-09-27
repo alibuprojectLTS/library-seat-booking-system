@@ -11,12 +11,12 @@ export const getDashboardStats = async (req, res) => {
     const availableSeats = await Seat.count({ where: { seat_status: 'available' } });
     const bookedSeats = await Seat.count({ where: { seat_status: 'booked' } });
 
-    // ✅ Total bookings = only PAID
+    // Total bookings = only PAID
     const totalBookings = await Booking.count({
       where: { booking_status: 'paid' }
     });
 
-    // ✅ Total revenue = sum of paid bookings
+    // Total revenue = sum of paid bookings
     const revenueResult = await Booking.sum('total_amount', {
       where: { booking_status: 'paid' }
     });
@@ -226,6 +226,112 @@ export const createAnnouncement = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to create announcement'
+    });
+  }
+};
+
+/**
+ * Get all announcements (Admin — includes inactive + expired)
+ */
+export const getAllAnnouncementsAdmin = async (req, res) => {
+  try {
+    const announcements = await Announcement.findAll({
+      include: [
+        { model: User, attributes: ['first_name', 'last_name'] }
+      ],
+      order: [
+        ['is_pinned', 'DESC'],
+        ['created_at', 'DESC']
+      ]
+    });
+
+    res.json({
+      success: true,
+      announcements
+    });
+  } catch (error) {
+    console.error('Get all announcements error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch announcements'
+    });
+  }
+};
+
+/**
+ * Update announcement (Admin)
+ */
+export const updateAnnouncementAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      content,
+      announcement_type,
+      priority,
+      is_pinned,
+      is_active,
+      expires_at
+    } = req.body;
+
+    const announcement = await Announcement.findByPk(id);
+    if (!announcement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Announcement not found'
+      });
+    }
+
+    await announcement.update({
+      title: title ?? announcement.title,
+      content: content ?? announcement.content,
+      announcement_type: announcement_type ?? announcement.announcement_type,
+      priority: priority ?? announcement.priority,
+      is_pinned: is_pinned ?? announcement.is_pinned,
+      is_active: is_active ?? announcement.is_active,
+      expires_at: expires_at !== undefined ? expires_at : announcement.expires_at
+    });
+
+    res.json({
+      success: true,
+      message: 'Announcement updated successfully',
+      announcement
+    });
+  } catch (error) {
+    console.error('Update announcement error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to update announcement'
+    });
+  }
+};
+
+/**
+ * Delete announcement (Admin)
+ */
+export const deleteAnnouncementAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const announcement = await Announcement.findByPk(id);
+    if (!announcement) {
+      return res.status(404).json({
+        success: false,
+        message: 'Announcement not found'
+      });
+    }
+
+    await announcement.destroy();
+
+    res.json({
+      success: true,
+      message: 'Announcement deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete announcement error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete announcement'
     });
   }
 };

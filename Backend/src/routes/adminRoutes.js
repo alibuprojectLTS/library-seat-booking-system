@@ -5,6 +5,9 @@ import {
   replyToQuery,
   deleteInactiveUsers,
   createAnnouncement,
+  getAllAnnouncementsAdmin,
+  updateAnnouncementAdmin,
+  deleteAnnouncementAdmin,
   updateLibraryStatus,
   addSeat,
   updateSeat,
@@ -31,7 +34,10 @@ router.post('/queries/:id/reply', replyToQuery);
 router.delete('/users/inactive', deleteInactiveUsers);
 
 // Announcements
+router.get('/announcements', getAllAnnouncementsAdmin);
 router.post('/announcements', createAnnouncement);
+router.put('/announcements/:id', updateAnnouncementAdmin);
+router.delete('/announcements/:id', deleteAnnouncementAdmin);
 
 // Library Status
 router.put('/status', updateLibraryStatus);
