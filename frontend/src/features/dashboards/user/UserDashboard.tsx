@@ -38,7 +38,8 @@ interface Announcement {
   announcement_id: number;
   title: string;
   content: string;
-  created_at: string;
+  created_at?: string;
+  createdAt?: string;
 }
 
 const UserDashboard: React.FC = () => {
@@ -244,7 +245,7 @@ const UserDashboard: React.FC = () => {
                   <div>
                     <h3 className="font-bold text-gray-900">{a.title}</h3>
                     <p className="text-sm text-gray-600 line-clamp-2">{a.content}</p>
-                    <p className="text-xs text-gray-400 mt-1">{new Date(a.created_at).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-400 mt-1">{new Date(a.createdAt || a.created_at || '').toLocaleDateString()}</p>
                   </div>
                 </div>
               ))
