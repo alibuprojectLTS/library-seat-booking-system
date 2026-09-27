@@ -64,20 +64,25 @@ const UserDashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalSpent = bookings
-    .filter((b) => b.booking_status === 'paid')
-    .reduce((sum, b) => sum + Number(b.total_amount || 0), 0);
+  // ✅ Only PAID bookings
+  const paidBookings = bookings.filter((b) => b.booking_status === 'paid');
 
-  const activeBookings = bookings.filter((b) => b.booking_status === 'paid');
+  const totalSpent = paidBookings.reduce(
+    (sum, b) => sum + Number(b.total_amount || 0),
+    0
+  );
+
+  const activeBookings = paidBookings;
   const validTickets = tickets.filter((t) => t.is_valid);
 
+  // ✅ Trend — only paid bookings
   const bookingTrend = (() => {
     const days = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      const count = bookings.filter((b) => b.booking_date === dateStr).length;
+      const count = paidBookings.filter((b) => b.booking_date === dateStr).length;
       days.push({ date: dateStr, count });
     }
     return days;
@@ -92,7 +97,7 @@ const UserDashboard: React.FC = () => {
   const PIE_COLORS = ['#10B981', '#F59E0B', '#EF4444'];
 
   const metrics = [
-    { title: 'Total Bookings', value: bookings.length, icon: faCalendarCheck, bg: 'bg-blue-50', color: 'text-blue-600' },
+    { title: 'Total Bookings', value: activeBookings.length, icon: faCalendarCheck, bg: 'bg-blue-50', color: 'text-blue-600' },
     { title: 'Active Bookings', value: activeBookings.length, icon: faClock, bg: 'bg-emerald-50', color: 'text-emerald-600' },
     { title: 'My Tickets', value: validTickets.length, icon: faTicket, bg: 'bg-purple-50', color: 'text-purple-600' },
     { title: 'Total Spent', value: `MK ${totalSpent}`, icon: faWallet, bg: 'bg-amber-50', color: 'text-amber-600' },
@@ -102,7 +107,7 @@ const UserDashboard: React.FC = () => {
     { label: 'Book a Seat', path: '/seats', icon: faChair, color: 'bg-blue-600' },
     { label: 'My Tickets', path: '/user/tickets', icon: faTicket, color: 'bg-purple-600' },
     { label: 'My Bookings', path: '/user/bookings', icon: faCalendarCheck, color: 'bg-emerald-600' },
-    { label: 'Submit Query', path: '/queries', icon: faCommentDots, color: 'bg-pink-600' },
+    { label: 'Submit Query', path: '/user/queries', icon: faCommentDots, color: 'bg-pink-600' },
   ];
 
   const formatDate = (d: string) =>
@@ -153,7 +158,7 @@ const UserDashboard: React.FC = () => {
           <div className="p-4 border-b flex items-center justify-between">
             <div>
               <h2 className="font-extrabold text-gray-900 text-lg">Booking Trend</h2>
-              <p className="text-xs text-gray-500">Last 7 days</p>
+              <p className="text-xs text-gray-500">Last 7 days (paid only)</p>
             </div>
             <Link to="/user/bookings" className="text-sm text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1">
               View <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
