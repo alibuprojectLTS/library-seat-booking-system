@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDesktop, faBook, faUsers, faChair } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDesktop,
+  faBook,
+  faUsers,
+  faChair,
+  faArrowRight,
+} from '@fortawesome/free-solid-svg-icons';
 import { getSections, type Section } from '../../../api/seats/seatApi';
 
 // Keys MUST match DB `section_name` exactly
@@ -96,7 +103,7 @@ const LibrarySections: React.FC = () => {
             return (
               <div
                 key={s.section_id}
-                className="card-hover rounded-2xl border border-gray-100 bg-white p-6 shadow-md"
+                className="card-hover rounded-2xl border border-gray-100 bg-white p-6 shadow-md flex flex-col"
               >
                 <div
                   className={`h-14 w-14 rounded-xl ${meta.bg} flex items-center justify-center border ${meta.border}`}
@@ -118,6 +125,14 @@ const LibrarySections: React.FC = () => {
                     MK {Number(s.price_per_seat).toLocaleString()} / seat
                   </span>
                 </div>
+
+                <Link
+                  to="/seats"
+                  className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition"
+                >
+                  View live availability
+                  <FontAwesomeIcon icon={faArrowRight} className="size-3" />
+                </Link>
               </div>
             );
           })}
