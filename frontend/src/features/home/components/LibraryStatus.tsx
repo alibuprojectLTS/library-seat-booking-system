@@ -77,7 +77,13 @@ const LibraryStatus: React.FC = () => {
                 Status
               </p>
               <p className="text-3xl font-extrabold text-blue-600 mt-3">
-                {isOpen ? 'Accepting' : 'Closed'}
+                {status.current_state === 'open'
+                  ? 'Accepting'
+                  : status.current_state === 'full'
+                  ? 'Full'
+                  : status.current_state === 'maintenance'
+                  ? 'Maintenance'
+                  : 'Closed'}
               </p>
             </div>
           </div>
