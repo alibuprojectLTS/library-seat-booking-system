@@ -1,21 +1,9 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT),
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * Send booking confirmation email
- */
 export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
   try {
     const seatList = seats.map(s => s.seat_label).join(', ');
@@ -47,36 +35,38 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
       </div>
     `;
 
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    const { data, error } = await resend.emails.send({
+      from: 'Library Seat Booking <onboarding@resend.dev>',
       to: user.email,
       subject: `✅ Booking Confirmation #${booking.booking_id}`,
-      html
+      html,
     });
 
-    console.log('✅ Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    if (error) throw new Error(error.message);
+
+    console.log('✅ Email sent:', data.id);
+    return { success: true, id: data.id };
   } catch (error) {
-    console.error('❌ Email error:', error);
+    console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
   }
 };
 
-/**
- * Send generic email
- */
 export const sendEmail = async ({ to, subject, html, text }) => {
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    const { data, error } = await resend.emails.send({
+      from: 'Library Seat Booking <onboarding@resend.dev>',
       to,
       subject,
       html,
-      text
+      text,
     });
-    return { success: true, messageId: info.messageId };
+
+    if (error) throw new Error(error.message);
+    console.log('✅ Email sent:', data.id);
+    return { success: true, id: data.id };
   } catch (error) {
-    console.error('❌ Email error:', error);
+    console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
   }
 };
