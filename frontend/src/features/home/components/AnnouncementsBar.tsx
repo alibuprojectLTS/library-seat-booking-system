@@ -30,7 +30,6 @@ const AnnouncementsBar: React.FC = () => {
           <div className="flex gap-12 animate-ticker whitespace-nowrap">
             {announcements.concat(announcements).map((a, idx) => (
               <div key={idx} className="flex items-center gap-3 text-base font-semibold">
-                {a.is_pinned && <span className="text-yellow-300 text-lg">📌</span>}
                 <span className="font-extrabold text-yellow-300 text-lg">{a.title}:</span>
                 <span className="text-white/95">{a.content}</span>
               </div>

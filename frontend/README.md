@@ -199,6 +199,51 @@ npm run dev	Start development server
 npm run build	Build for production
 npm run preview	Preview production build
 npm run lint	Run ESLint
+
+🚀 Deployment
+The frontend is deployed on Vercel with automatic continuous deployment from GitHub.
+
+Service	Provider	URL
+Frontend	Vercel	https://your-vercel-url.vercel.app
+Backend API	Render	https://libraryseat-api.onrender.com
+Database	Neon (PostgreSQL)	(serverless)
+Deployment Steps (Vercel)
+Sign up on Vercel with GitHub.
+
+Click Add New → Project and import library-seat-booking-system.
+
+Set Root Directory to frontend.
+
+Framework preset is auto-detected as Vite.
+
+Add environment variable:
+
+VITE_API_URL = https://libraryseat-api.onrender.com/api
+
+Click Deploy.
+
+Continuous Deployment
+Every push to the main branch automatically triggers a new deployment on Vercel. The backend on Render redeploys via its own auto-deploy hook. No manual steps are needed after the initial setup.
+
+SPA Routing Fix
+A vercel.json file at the root of frontend/ ensures all routes fall back to index.html so that React Router handles client-side routing:
+
+json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+⚠️ ACTION REQUIRED
+Replace https://your-vercel-url.vercel.app with your actual Vercel URL.
+
+To find your real URL:
+
+Go to https://vercel.com/dashboard
+
+Click your project
+
+Copy the URL shown under Domains
 🎯 Features
 Features
 The Library Seat Booking System includes a complete public home page featuring a hero carousel with rotating slides, animated statistics counters, an announcements bar, a live library status section showing open/closed state and capacity utilization, a four-step how-to-use guide, library sections overview, newsletter subscription, a mini contact section, a scrolling partners marquee, and a full footer with contact details. A dedicated contact page is available with a full contact form, contact information cards, and an animated background. Authentication is fully implemented with email and password login, registration with validation, JWT token management, protected routes with role-based access control, and session expiry handling with a re-login prompt.

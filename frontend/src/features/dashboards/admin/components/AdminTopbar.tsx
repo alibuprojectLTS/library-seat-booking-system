@@ -40,21 +40,26 @@ const AdminTopbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 px-3 sm:px-4 md:px-6 py-3 flex items-center justify-between">
       {/* Left */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <button
           onClick={onToggleSidebar}
-          className="text-gray-600 hover:text-indigo-600 transition"
+          className="text-gray-600 hover:text-indigo-600 transition shrink-0"
+          aria-label="Toggle sidebar"
         >
           <FontAwesomeIcon icon={faBars} className="text-xl" />
         </button>
 
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faLandmark} className="text-indigo-600 text-xl" />
-          <h1 className="text-xl font-bold text-gray-800">
+        <div className="flex items-center gap-2 min-w-0">
+          <FontAwesomeIcon
+            icon={faLandmark}
+            className="text-indigo-600 text-xl shrink-0"
+          />
+          <h1 className="text-base sm:text-xl font-bold text-gray-800 truncate">
             Admin
-            <span className="ml-2 text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+            {/* Hide badge on small screens */}
+            <span className="hidden sm:inline ml-2 text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
               Dashboard
             </span>
           </h1>
@@ -62,10 +67,11 @@ const AdminTopbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-3 sm:gap-5 shrink-0">
         <Link
           to="/admin/queries"
           className="relative text-gray-600 hover:text-indigo-600 transition"
+          aria-label="Notifications"
         >
           <FontAwesomeIcon icon={faBell} className="text-xl" />
         </Link>
@@ -74,22 +80,23 @@ const AdminTopbar: React.FC<TopbarProps> = ({ onToggleSidebar }) => {
           <button
             onClick={() => setOpen((p) => !p)}
             className="flex items-center gap-2 group"
+            aria-label="User menu"
           >
-            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
               {user?.first_name?.[0]?.toUpperCase() || 'A'}
             </div>
             <FontAwesomeIcon
               icon={faChevronDown}
-              className={`text-sm text-gray-500 transition-transform ${
+              className={`hidden sm:inline text-sm text-gray-500 transition-transform ${
                 open ? 'rotate-180' : ''
               }`}
             />
           </button>
 
           {open && (
-            <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+            <div className="absolute right-0 mt-3 w-60 sm:w-64 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
               <div className="px-4 py-3 bg-indigo-50 border-b border-indigo-100">
-                <p className="font-bold text-gray-900 text-base">
+                <p className="font-bold text-gray-900 text-base truncate">
                   {user?.first_name} {user?.last_name}
                 </p>
                 <p className="text-sm text-gray-600 truncate">{user?.email}</p>

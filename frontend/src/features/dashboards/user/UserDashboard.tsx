@@ -122,7 +122,7 @@ const UserDashboard: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-              Welcome, {user?.first_name}! 👋
+              Welcome, {user?.first_name}
             </h1>
             <p className="text-gray-600 mt-1">Here's your library activity overview</p>
           </div>

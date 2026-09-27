@@ -13,12 +13,15 @@ import {
   faCheckCircle,
   faUser,
   faRightFromBracket,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
 
 interface SidebarProps {
   isOpen: boolean;
+  onClose?: () => void;
+  isMobile?: boolean;
 }
 
 const menuItems = [
@@ -33,7 +36,7 @@ const menuItems = [
   { icon: faUser, label: 'Profile', path: '/admin/profile' },
 ];
 
-const AdminSidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { setUser } = useAuth();
@@ -48,7 +51,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   return (
     <aside
       className={`bg-indigo-600 text-white h-full transition-all duration-300 flex flex-col ${
-        isOpen ? 'w-72' : 'w-20'
+        isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'
       }`}
     >
       {/* Logo */}
@@ -56,13 +59,23 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
           <FontAwesomeIcon icon={faBook} className="text-indigo-600 text-2xl" />
         </div>
-        {isOpen && (
-          <div className="leading-tight">
+        {(isMobile || isOpen) && (
+          <div className="leading-tight flex-1">
             <p className="text-sm font-bold tracking-wider text-indigo-100">
               ADMIN PANEL
             </p>
             <p className="text-xl font-extrabold text-white">LIBRARYSEAT</p>
           </div>
+        )}
+        {/* Mobile close button */}
+        {isMobile && (
+          <button
+            onClick={onClose}
+            className="text-white hover:text-red-300 transition p-2"
+            aria-label="Close sidebar"
+          >
+            <FontAwesomeIcon icon={faTimes} className="text-2xl" />
+          </button>
         )}
       </div>
 
@@ -81,7 +94,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen }) => {
               }`}
             >
               <FontAwesomeIcon icon={item.icon} className="text-xl w-6 shrink-0" />
-              {isOpen && <span className="text-lg">{item.label}</span>}
+              {(isMobile || isOpen) && <span className="text-lg">{item.label}</span>}
             </Link>
           );
         })}
@@ -97,7 +110,9 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             icon={faRightFromBracket}
             className="text-xl w-6 shrink-0"
           />
-          {isOpen && <span className="text-lg font-bold">Logout</span>}
+          {(isMobile || isOpen) && (
+            <span className="text-lg font-bold">Logout</span>
+          )}
         </button>
       </div>
     </aside>
