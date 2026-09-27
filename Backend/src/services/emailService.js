@@ -1,28 +1,23 @@
-import nodemailer from 'nodemailer';
+import * as brevo from '@getbrevo/brevo';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT),
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  },
-  // ✅ Add timeouts so it doesn't hang forever
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
-});
+const apiInstance = new brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(
+  brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
 
+/**
+ * Send booking confirmation email
+ */
 export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
   try {
-    const seatList = seats.map(s => s.seat_label).join(', ');
+    const seatList = seats.map((s) => s.seat_label).join(', ');
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #1e40af;"> Booking Confirmation</h1>
+        <h1 style="color: #1e40af;">📚 Booking Confirmation</h1>
         <p>Hello ${user.first_name},</p>
         <p>Your booking has been confirmed!</p>
 
@@ -46,31 +41,41 @@ export const sendBookingConfirmation = async (user, booking, ticket, seats) => {
       </div>
     `;
 
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: user.email,
-      subject: ` Booking Confirmation #${booking.booking_id}`,
-      html
-    });
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `Booking Confirmation #${booking.booking_id}`;
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.sender = {
+      name: 'Library Seat Booking',
+      email: process.env.BREVO_SENDER_EMAIL || 'leojamu21@gmail.com',
+    };
+    sendSmtpEmail.to = [{ email: user.email, name: user.first_name }];
 
-    console.log(' Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('✅ Email sent:', data.messageId);
+    return { success: true, messageId: data.messageId };
   } catch (error) {
     console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
   }
 };
 
+/**
+ * Send generic email
+ */
 export const sendEmail = async ({ to, subject, html, text }) => {
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to,
-      subject,
-      html,
-      text
-    });
-    return { success: true, messageId: info.messageId };
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.textContent = text;
+    sendSmtpEmail.sender = {
+  name: 'Library Seat Booking',
+  email: process.env.BREVO_SENDER_EMAIL || 'alibuprojectlts@gmail.com',
+};
+    sendSmtpEmail.to = [{ email: to }];
+
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    return { success: true, messageId: data.messageId };
   } catch (error) {
     console.error('❌ Email error:', error.message);
     return { success: false, error: error.message };
