@@ -70,9 +70,8 @@ const AdminDashboard: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-              Welcome, Admin 
+              Welcome, Admin
             </h1>
-            <p className="text-gray-600 mt-1">Here's your admin overview</p>
           </div>
           <div className="text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full">
             📅 {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}

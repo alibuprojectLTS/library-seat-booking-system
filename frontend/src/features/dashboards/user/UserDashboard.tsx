@@ -124,7 +124,6 @@ const UserDashboard: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
               Welcome, {user?.first_name}
             </h1>
-            <p className="text-gray-600 mt-1">Here's your library activity overview</p>
           </div>
           <div className="text-sm font-bold bg-blue-50 text-blue-700 px-4 py-2 rounded-full">
             📅 {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
