@@ -79,3 +79,43 @@ export const getTicketById = async (req, res) => {
     });
   }
 };
+
+/**
+ * Delete ticket (hard delete)
+ */
+export const deleteTicket = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const ticket = await Ticket.findOne({
+      where: { ticket_id: id },
+      include: [
+        {
+          model: Booking,
+          where: { user_id: userId }
+        }
+      ]
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found'
+      });
+    }
+
+    await ticket.destroy();
+
+    res.json({
+      success: true,
+      message: 'Ticket deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete ticket error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete ticket'
+    });
+  }
+};
