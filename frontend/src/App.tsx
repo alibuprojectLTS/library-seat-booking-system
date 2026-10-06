@@ -42,13 +42,7 @@ import React from 'react';
 
 import MaintenancePage from './features/maintenance/MaintenancePage';
 
-// ============================================================
-// ⚠️ MAINTENANCE MODE ACTIVE
-// To restore the full site:
-//   1. Uncomment all imports above (remove leading //)
-//   2. Uncomment the <AuthProvider> block below
-//   3. Delete the "return <MaintenancePage />;" line
-// ============================================================
+
 
 const App: React.FC = () => {
   return <MaintenancePage />;
