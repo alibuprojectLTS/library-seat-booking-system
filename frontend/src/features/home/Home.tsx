@@ -18,6 +18,7 @@ const Home: React.FC = () => {
         entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('is-visible')),
       { threshold: 0.12 }
     );
+	
     document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
