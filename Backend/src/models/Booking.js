@@ -31,6 +31,12 @@ const Booking = sequelize.define('Booking', {
   expires_at: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  // ✅ Added to separate Online (PayChangu) vs Cash (POS)
+  payment_method: {
+    type: DataTypes.STRING(20),
+    defaultValue: 'online',
+    validate: { isIn: [['online', 'cash']] }
   }
 }, {
   tableName: 'bookings',

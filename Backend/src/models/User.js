@@ -33,7 +33,8 @@ const User = sequelize.define('User', {
   role: {
     type: DataTypes.STRING(20),
     defaultValue: 'user',
-    validate: { isIn: [['user', 'admin']] }
+    // ✅ Added 'staff' and 'finance' for the new dashboards
+    validate: { isIn: [['user', 'admin', 'staff', 'finance']] }
   },
   is_active: {
     type: DataTypes.BOOLEAN,

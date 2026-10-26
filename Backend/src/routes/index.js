@@ -11,6 +11,10 @@ import ticketRoutes from './ticketRoutes.js';
 import checkinRoutes from './checkinRoutes.js';
 import searchRoutes from './searchRoutes.js';
 
+//  Import the new route files we will create next
+import staffRoutes from './staffRoutes.js';
+import financeRoutes from './financeRoutes.js';
+
 const router = express.Router();
 
 // Public routes
@@ -29,5 +33,9 @@ router.use('/tickets', ticketRoutes);
 router.use('/admin', adminRoutes);
 router.use('/admin', checkinRoutes);
 router.use('/admin', searchRoutes);
+
+//  Staff and Finance routes
+router.use('/staff', staffRoutes);
+router.use('/finance', financeRoutes);
 
 export default router;

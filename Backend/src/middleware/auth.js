@@ -14,7 +14,6 @@ export const authenticate = (req, res, next) => {
       });
     }
 
-    // ✅ Accept both "Bearer <token>" and "<token>"
     const token = authHeader.startsWith('Bearer ')
       ? authHeader.split(' ')[1]
       : authHeader;
@@ -37,6 +36,30 @@ export const isAdmin = (req, res, next) => {
     res.status(403).json({
       success: false,
       message: 'Admin privileges required'
+    });
+  }
+};
+
+// ✅ NEW: Allow Library Staff and Admin to use POS and Check-in
+export const isStaff = (req, res, next) => {
+  if (req.user && (req.user.role === 'staff' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Staff privileges required'
+    });
+  }
+};
+
+// ✅ NEW: Allow Financial Officer and Admin to view reports/refunds
+export const isFinance = (req, res, next) => {
+  if (req.user && (req.user.role === 'finance' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Financial privileges required'
     });
   }
 };

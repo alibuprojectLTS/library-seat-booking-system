@@ -27,6 +27,15 @@ const Ticket = sequelize.define('Ticket', {
   qr_code_data: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  // ✅ Added for staff Check-In process
+  checked_in: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  checked_in_at: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   tableName: 'tickets',
