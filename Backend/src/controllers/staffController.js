@@ -1,7 +1,7 @@
 import { sequelize } from '../models/index.js';
 import { Booking, BookingItem, Seat, Ticket, User } from '../models/index.js';
-import { generateTicketCode, generateQRCode } from '../services/qrService.js';
-import { sendTicketEmail } from '../services/emailService.js';
+import QRService from '../services/qrService.js';
+import { sendBookingConfirmation } from '../services/emailService.js';
 
 /**
  * POS — Process Cash Booking (Library Staff)
@@ -25,7 +25,6 @@ export const processPOSBooking = async (req, res) => {
     // 1. Check if user exists by email, or create a guest user
     let user = await User.findOne({ where: { email: occupant_email }, transaction });
     if (!user) {
-      // Generate a random temporary password
       const tempPassword = Math.random().toString(36).slice(-8);
       user = await User.create({
         first_name: occupant_name.split(' ')[0] || 'POS',
@@ -38,7 +37,6 @@ export const processPOSBooking = async (req, res) => {
 
     // 2. Calculate total
     const seatRecords = await Seat.findAll({ where: { seat_id: seats }, transaction });
-    // You can fetch price from LibrarySection. For now, assuming MK 200 flat or fetch dynamically.
     const totalAmount = seatRecords.length * 200; 
 
     // 3. Create Booking (Status: PAID, Method: CASH)
@@ -48,16 +46,18 @@ export const processPOSBooking = async (req, res) => {
       booking_status: 'paid',
       total_seats: seats.length,
       total_amount: totalAmount,
-      payment_method: 'cash' // Marked as cash
+      payment_method: 'cash'
     }, { transaction });
 
     // 4. Create Booking Items & Lock Seats
+    const bookingItems = [];
     for (const seatId of seats) {
-      await BookingItem.create({
+      const item = await BookingItem.create({
         booking_id: booking.booking_id,
         seat_id: seatId,
         occupant_name: occupant_name
       }, { transaction });
+      bookingItems.push(item);
 
       await Seat.update(
         { seat_status: 'booked' },
@@ -65,9 +65,9 @@ export const processPOSBooking = async (req, res) => {
       );
     }
 
-    // 5. Generate Ticket & QR
-    const ticketCode = generateTicketCode(booking.booking_id, user.user_id);
-    const qrData = await generateQRCode(ticketCode);
+    // 5. Generate Ticket & QR using your QRService class
+    const ticketCode = QRService.generateTicketCode(booking.booking_id);
+    const qrData = await QRService.generateQRCode(ticketCode);
 
     const ticket = await Ticket.create({
       booking_id: booking.booking_id,
@@ -78,13 +78,10 @@ export const processPOSBooking = async (req, res) => {
 
     await transaction.commit();
 
-    // 6. Send Email (Async)
-    sendTicketEmail(occupant_email, {
-      ticketCode: ticket.ticket_code,
-      date: booking.booking_date,
-      amount: booking.total_amount,
-      qrCode: ticket.qr_code_data
-    }).catch(err => console.error('POS Email error:', err));
+    // 6. Send Email (Async - uses your exact Brevo function)
+    // We pass the created booking, ticket, user, and seat records to the email service
+    sendBookingConfirmation(user, booking, ticket, seatRecords)
+      .catch(err => console.error('POS Email error:', err));
 
     res.json({
       success: true,
@@ -95,7 +92,7 @@ export const processPOSBooking = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.error('POS Booking error:', error);
-    res.status(500).json({ success: false, message: 'POS failed' });
+    res.status(500).json({ success: false, message: 'POS failed', error: error.message });
   }
 };
 
