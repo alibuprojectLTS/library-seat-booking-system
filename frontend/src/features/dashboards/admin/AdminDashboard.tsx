@@ -10,6 +10,9 @@ import {
   faArrowRight,
   faSpinner,
   faWallet,
+  faCalendarTimes,
+  faTags,
+  faLandmark, // ✅ Added import
 } from '@fortawesome/free-solid-svg-icons';
 import apiClient from '../../../api/core/apiClient';
 
@@ -51,10 +54,11 @@ const AdminDashboard: React.FC = () => {
 
   const quickActions = [
     { label: 'Manage Seats', path: '/admin/seats', icon: faChair, color: 'bg-indigo-600' },
-    { label: 'View Queries', path: '/admin/queries', icon: faComments, color: 'bg-amber-600' },
+    { label: 'Manage Bookings', path: '/admin/bookings', icon: faCalendarTimes, color: 'bg-rose-600' },
+    { label: 'Price Management', path: '/admin/pricing', icon: faTags, color: 'bg-teal-600' },
     { label: 'Manage Users', path: '/admin/users', icon: faUsers, color: 'bg-blue-600' },
     { label: 'Post Announcement', path: '/admin/announcements', icon: faBullhorn, color: 'bg-pink-600' },
-    { label: 'Library Status', path: '/admin/status', icon: faChair, color: 'bg-emerald-600' },
+    { label: 'Library Status', path: '/admin/status', icon: faLandmark, color: 'bg-emerald-600' },
     { label: 'CSV Upload', path: '/admin/csv-upload', icon: faChair, color: 'bg-purple-600' },
   ];
 
@@ -68,7 +72,6 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* Welcome */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -82,7 +85,6 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m) => (
           <div
@@ -102,7 +104,6 @@ const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="p-4 border-b">
           <h2 className="font-extrabold text-gray-900 text-lg">Quick Actions</h2>

@@ -8,12 +8,12 @@ import {
   faBullhorn,
   faLandmark,
   faUsers,
-  faComments,
   faFileCsv,
-  faCheckCircle,
   faUser,
   faRightFromBracket,
   faTimes,
+  faCalendarTimes, // ✅ NEW
+  faTags,          // ✅ NEW
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -24,15 +24,16 @@ interface SidebarProps {
   isMobile?: boolean;
 }
 
+// ✅ UPDATED MENU ITEMS
 const menuItems = [
   { icon: faHome, label: 'Dashboard', path: '/admin' },
   { icon: faChair, label: 'Manage Seats', path: '/admin/seats' },
-  { icon: faComments, label: 'Queries', path: '/admin/queries' },
+  { icon: faCalendarTimes, label: 'Bookings', path: '/admin/bookings' },
+  { icon: faTags, label: 'Pricing', path: '/admin/pricing' },
   { icon: faUsers, label: 'Users', path: '/admin/users' },
   { icon: faBullhorn, label: 'Announcements', path: '/admin/announcements' },
   { icon: faLandmark, label: 'Library Status', path: '/admin/status' },
   { icon: faFileCsv, label: 'CSV Upload', path: '/admin/csv-upload' },
-  { icon: faCheckCircle, label: 'Check-In', path: '/admin/checkin' },
   { icon: faUser, label: 'Profile', path: '/admin/profile' },
 ];
 
@@ -54,7 +55,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
         isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'
       }`}
     >
-      {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-7 border-b border-indigo-500">
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
           <FontAwesomeIcon icon={faBook} className="text-indigo-600 text-2xl" />
@@ -64,22 +64,16 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
             <p className="text-sm font-bold tracking-wider text-indigo-100">
               ADMIN PANEL
             </p>
-            <p className="text-xl font-extrabold text-white">LIBRARYSEAT</p>
+            <p className="text-xl font-extrabold text-white">e-ticketing</p>
           </div>
         )}
-        {/* Mobile close button */}
         {isMobile && (
-          <button
-            onClick={onClose}
-            className="text-white hover:text-red-300 transition p-2"
-            aria-label="Close sidebar"
-          >
+          <button onClick={onClose} className="text-white hover:text-red-300 transition p-2">
             <FontAwesomeIcon icon={faTimes} className="text-2xl" />
           </button>
         )}
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 py-6 space-y-2 px-3 overflow-y-auto">
         {menuItems.map((item) => {
           const active = location.pathname === item.path;
@@ -100,19 +94,13 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
         })}
       </nav>
 
-      {/* Logout */}
       <div className="p-3 border-t border-indigo-500">
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-indigo-100 hover:bg-red-500 hover:text-white transition-all font-semibold"
         >
-          <FontAwesomeIcon
-            icon={faRightFromBracket}
-            className="text-xl w-6 shrink-0"
-          />
-          {(isMobile || isOpen) && (
-            <span className="text-lg font-bold">Logout</span>
-          )}
+          <FontAwesomeIcon icon={faRightFromBracket} className="text-xl w-6 shrink-0" />
+          {(isMobile || isOpen) && <span className="text-lg font-bold">Logout</span>}
         </button>
       </div>
     </aside>

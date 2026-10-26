@@ -37,6 +37,9 @@ import ManageSeats from './features/dashboards/admin/pages/ManageSeats';
 import CSVUpload from './features/dashboards/admin/pages/CSVUpload';
 import Announcements from './features/dashboards/admin/pages/Announcements';
 import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
+import ManageBookings from './features/dashboards/admin/pages/ManageBookings'; // ✅ NEW
+import ManageUsers from './features/dashboards/admin/pages/ManageUsers';       // ✅ NEW
+import ManagePricing from './features/dashboards/admin/pages/ManagePricing';   // ✅ NEW
 
 // Staff Dashboard
 import StaffLayout from './features/dashboards/staff/StaffLayout';
@@ -85,6 +88,9 @@ const App: React.FC = () => (
         <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="seats" element={<ManageSeats />} />
+          <Route path="bookings" element={<ManageBookings />} />    {/* ✅ NEW */}
+          <Route path="pricing" element={<ManagePricing />} />      {/* ✅ NEW */}
+          <Route path="users" element={<ManageUsers />} />          {/* ✅ NEW */}
           <Route path="csv-upload" element={<CSVUpload />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="status" element={<LibraryStatus />} />
