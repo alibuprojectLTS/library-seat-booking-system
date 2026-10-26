@@ -10,6 +10,7 @@ import Home from './features/home/Home';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
 import Contact from './features/contact/Contact';
+import About from './features/about/About';
 
 // User Dashboard
 import UserLayout from './features/dashboards/user/UserLayout';
@@ -65,6 +66,7 @@ const App: React.FC = () => (
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
+		<Route path="/about" element={<About />} />
 
         {/* ---------- User Dashboard ---------- */}
         <Route path="/user" element={<ProtectedRoute role="user"><UserLayout /></ProtectedRoute>}>
