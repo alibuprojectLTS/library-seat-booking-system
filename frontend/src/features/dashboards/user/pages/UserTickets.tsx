@@ -32,16 +32,6 @@ const UserTickets: React.FC = () => {
     fetchTickets();
   }, []);
 
-  const deleteTicket = async (id: number) => {
-    try {
-      await apiClient.delete(`/tickets/${id}`);
-      toast.success('Ticket deleted');
-      setTickets((prev) => prev.filter((t) => t.ticket_id !== id));
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to delete');
-    }
-  };
-
   // Auto-hide tickets older than 2 days
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 2);
@@ -83,7 +73,6 @@ const UserTickets: React.FC = () => {
               <TicketCard
                 key={t.ticket_id}
                 ticket={t}
-                onDelete={() => deleteTicket(t.ticket_id)}
               />
             ))}
           </div>
