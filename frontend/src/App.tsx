@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import StaffQueries from './features/dashboards/staff/pages/StaffQueries'; 
 
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -102,6 +103,7 @@ const App: React.FC = () => (
         <Route path="/staff" element={<ProtectedRoute role="staff"><StaffLayout /></ProtectedRoute>}>
           <Route index element={<POS />} />
           <Route path="checkin" element={<CheckIn />} />
+		  <Route path="queries" element={<StaffQueries />} /> {/* ✅ Add this */}
         </Route>
 
         {/* ---------- Finance Dashboard ---------- */}

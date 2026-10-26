@@ -6,7 +6,7 @@ import {
   faCashRegister,
   faCheckCircle,
   faRightFromBracket,
-  faTimes,
+  faTimes,faComments,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -20,6 +20,7 @@ interface SidebarProps {
 const menuItems = [
   { icon: faCashRegister, label: 'Point of Sale', path: '/staff' },
   { icon: faCheckCircle, label: 'Check-In', path: '/staff/checkin' },
+  { icon: faComments, label: 'Queries', path: '/staff/queries' },
 ];
 
 const StaffSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
