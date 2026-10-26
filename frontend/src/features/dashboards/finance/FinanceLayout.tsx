@@ -25,7 +25,9 @@ const FinanceLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {isMobile && sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+      {isMobile && sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
       <div className={`${isMobile ? `fixed top-0 left-0 h-full z-50 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}` : 'relative'}`}>
         <FinanceSidebar isOpen={isMobile ? true : sidebarOpen} onClose={() => setSidebarOpen(false)} isMobile={isMobile} />
       </div>

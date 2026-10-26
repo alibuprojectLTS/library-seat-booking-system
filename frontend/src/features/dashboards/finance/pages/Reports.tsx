@@ -40,14 +40,14 @@ const Reports: React.FC = () => {
         </div>
         <div className="flex gap-2">
           {['daily', 'weekly', 'monthly'].map(p => (
-            <button key={p} onClick={() => setPeriod(p as any)} className={`h-9 px-4 rounded-md text-sm font-semibold capitalize transition ${period === p ? 'bg-purple-700 text-white' : 'bg-white border border-gray-200 text-gray-700'}`}>{p}</button>
+            <button key={p} onClick={() => setPeriod(p as any)} className={`h-9 px-4 rounded-md text-sm font-semibold capitalize transition ${period === p ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-700'}`}>{p}</button>
           ))}
           <button onClick={() => fetchReport(period)} className="h-9 px-3 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200"><FontAwesomeIcon icon={faSync} className={loading ? 'animate-spin' : ''} /></button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20"><FontAwesomeIcon icon={faSpinner} className="animate-spin text-4xl text-purple-600" /></div>
+        <div className="flex justify-center py-20"><FontAwesomeIcon icon={faSpinner} className="animate-spin text-4xl text-indigo-600" /></div>
       ) : report ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
