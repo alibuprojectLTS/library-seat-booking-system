@@ -1,38 +1,51 @@
-import { Booking } from '../models/index.js';
+import { Booking, User } from '../models/index.js';
 import { Op } from 'sequelize';
 
 /**
- * Finance — Get Revenue Reports
+ * Finance — Get Revenue Reports & Payment List
  */
 export const getFinancialReport = async (req, res) => {
   try {
     const { period } = req.query; // 'daily', 'weekly', 'monthly'
 
+    // ✅ Calculate start date based on the period
+    const now = new Date();
     let startDate = new Date();
-    if (period === 'weekly') startDate.setDate(startDate.getDate() - 7);
-    if (period === 'monthly') startDate.setMonth(startDate.getMonth() - 1);
 
+    if (period === 'weekly') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (period === 'monthly') {
+      startDate.setMonth(now.getMonth() - 1);
+    }
+    
+    // ✅ Force start time to the very beginning of the day
+    startDate.setHours(0, 0, 0, 0);
+
+    // 1. Get the summarized stats
     const revenue = await Booking.sum('total_amount', {
-      where: {
-        booking_status: 'paid',
-        created_at: { [Op.gte]: startDate }
-      }
+      where: { booking_status: 'paid', created_at: { [Op.gte]: startDate } }
     });
 
     const totalTickets = await Booking.sum('total_seats', {
-      where: {
-        booking_status: 'paid',
-        created_at: { [Op.gte]: startDate }
-      }
+      where: { booking_status: 'paid', created_at: { [Op.gte]: startDate } }
     });
 
-    // Split by Online vs Cash
     const onlineRevenue = await Booking.sum('total_amount', {
       where: { booking_status: 'paid', payment_method: 'online', created_at: { [Op.gte]: startDate } }
     });
 
     const cashRevenue = await Booking.sum('total_amount', {
       where: { booking_status: 'paid', payment_method: 'cash', created_at: { [Op.gte]: startDate } }
+    });
+
+    // 2. Get the detailed list of who paid
+    const paymentsList = await Booking.findAll({
+      where: { 
+        booking_status: ['paid', 'refunded'], 
+        created_at: { [Op.gte]: startDate } 
+      },
+      include: [{ model: User, attributes: ['first_name', 'last_name', 'email'] }],
+      order: [['created_at', 'DESC']]
     });
 
     res.json({
@@ -42,12 +55,34 @@ export const getFinancialReport = async (req, res) => {
         totalRevenue: Number(revenue || 0),
         totalTicketsSold: Number(totalTickets || 0),
         onlineRevenue: Number(onlineRevenue || 0),
-        cashRevenue: Number(cashRevenue || 0)
+        cashRevenue: Number(cashRevenue || 0),
+        payments: paymentsList
       }
     });
 
   } catch (error) {
     console.error('Finance report error:', error);
     res.status(500).json({ success: false, message: 'Failed to get report' });
+  }
+};
+
+/**
+ * Process Refund
+ */
+export const processRefund = async (req, res) => {
+  try {
+    const { booking_id } = req.body;
+    
+    const booking = await Booking.findByPk(booking_id);
+    if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
+    if (booking.booking_status !== 'paid') return res.status(400).json({ success: false, message: 'Only paid bookings can be refunded' });
+
+    // Update status to refunded
+    await booking.update({ booking_status: 'refunded' });
+
+    res.json({ success: true, message: 'Refund processed successfully' });
+  } catch (error) {
+    console.error('Refund error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process refund' });
   }
 };
