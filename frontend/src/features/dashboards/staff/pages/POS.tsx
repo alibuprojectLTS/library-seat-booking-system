@@ -76,7 +76,6 @@ const POS: React.FC = () => {
         </h2>
         <p className="text-gray-500 mb-6">Select seats and confirm cash received to issue a ticket.</p>
 
-        {/* Section Tabs - Changed to Indigo to match dashboard */}
         <div className="flex gap-2 mb-6">
           {sections.map(s => (
             <button key={s.section_id} onClick={() => { setActiveSection(s.section_id); setSelectedSeats([]); }}
@@ -86,24 +85,37 @@ const POS: React.FC = () => {
           ))}
         </div>
 
-        {/* Seat Map - Colors matched to User SeatLegend */}
+        {/* ✅ ADDED LEGEND HERE */}
+        <div className="flex flex-wrap items-center gap-6 justify-center mb-6 py-2">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-md border bg-emerald-100 border-emerald-300" />
+            <span className="text-sm font-bold text-gray-700">Available</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-md border bg-blue-600 border-blue-700" />
+            <span className="text-sm font-bold text-gray-700">Selected</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-md border bg-red-100 border-red-300" />
+            <span className="text-sm font-bold text-gray-700">Booked</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-md border bg-gray-200 border-gray-300" />
+            <span className="text-sm font-bold text-gray-700">Deactivated</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3 mb-8">
           {seats.map(seat => {
             const isSelected = selectedSeats.includes(seat.seat_id);
             const isAvailable = seat.seat_status === 'available';
             const isBooked = seat.seat_status === 'booked';
             
-            // Match colors exactly to SeatMap
             let seatStyle = '';
-            if (isSelected) {
-              seatStyle = 'bg-blue-600 text-white border-blue-700 shadow-md scale-105';
-            } else if (isAvailable) {
-              seatStyle = 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200 cursor-pointer';
-            } else if (isBooked) {
-              seatStyle = 'bg-red-100 text-red-700 border-red-300 cursor-not-allowed opacity-70';
-            } else {
-              seatStyle = 'bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed opacity-60';
-            }
+            if (isSelected) seatStyle = 'bg-blue-600 text-white border-blue-700 shadow-md scale-105';
+            else if (isAvailable) seatStyle = 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200 cursor-pointer';
+            else if (isBooked) seatStyle = 'bg-red-100 text-red-700 border-red-300 cursor-not-allowed opacity-70';
+            else seatStyle = 'bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed opacity-60';
 
             return (
               <button key={seat.seat_id} onClick={() => toggleSeat(seat.seat_id, seat.seat_status)} disabled={!isAvailable}
@@ -115,7 +127,6 @@ const POS: React.FC = () => {
           })}
         </div>
 
-        {/* Cash Form */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <h3 className="font-bold text-lg mb-3">Occupant Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -133,7 +144,6 @@ const POS: React.FC = () => {
           </div>
         </div>
 
-        {/* Success Message */}
         {ticketCode && (
           <div className="mt-6 p-6 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
             <h3 className="text-xl font-bold text-emerald-800 mb-2">Ticket Issued Successfully!</h3>

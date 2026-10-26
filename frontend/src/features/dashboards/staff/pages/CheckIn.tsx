@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faCheckCircle, faTicketAlt, faSpinner, faCamera, faStopCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faCheckCircle, faTicketAlt, faSpinner, faCamera, faStopCircle, faUpload } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import apiClient from '../../../../api/core/apiClient';
-import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 const CheckIn: React.FC = () => {
   const [ticketCode, setTicketCode] = useState('');
@@ -13,8 +13,8 @@ const CheckIn: React.FC = () => {
   const [cameraLoading, setCameraLoading] = useState(false);
   
   const html5QrcodeRef = useRef<Html5Qrcode | null>(null);
-  const pluginStateRef = useRef<string>('initial');
   const qrRegionId = "reader";
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleVerify = async (code: string) => {
     if (!code) return;
@@ -56,43 +56,54 @@ const CheckIn: React.FC = () => {
     setStartScanning(false);
   };
 
+  // ✅ Camera Scan Logic
   useEffect(() => {
     if (!startScanning) return;
     if (!html5QrcodeRef.current) {
       html5QrcodeRef.current = new Html5Qrcode(qrRegionId);
     }
 
-    if (pluginStateRef.current !== 'starting') {
-      pluginStateRef.current = 'starting';
-      html5QrcodeRef.current.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        async (text) => {
-          if (html5QrcodeRef.current?.getState() === Html5QrcodeScannerState.SCANNING) {
-            html5QrcodeRef.current?.pause(true);
-          }
-          if ("vibrate" in navigator) navigator.vibrate(150);
-          setTicketCode(text);
-          setStartScanning(false);
-          handleVerify(text);
-        },
-        () => { /* ignore scan errors */ }
-      ).then(() => {
-        pluginStateRef.current = 'started';
-      }).catch(() => {
-        toast.error("Camera failed to start");
+    html5QrcodeRef.current.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async (text) => {
+        if ("vibrate" in navigator) navigator.vibrate(150);
+        setTicketCode(text);
         setStartScanning(false);
-      });
-    }
+        handleVerify(text);
+      },
+      () => {}
+    ).catch(() => {
+      toast.error("Camera failed to start");
+      setStartScanning(false);
+    });
 
     return () => {
-      if (html5QrcodeRef.current && pluginStateRef.current !== 'starting') {
-        html5QrcodeRef.current.stop().then(() => {
-          pluginStateRef.current = 'initial';
-        }).catch(console.error);
+      if (html5QrcodeRef.current) {
+        html5QrcodeRef.current.stop().catch(console.error);
+        html5QrcodeRef.current = null;
       }
     };
   }, [startScanning]);
+
+  // ✅ File Upload Scan Logic
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCameraLoading(true);
+    try {
+      const html5Qrcode = new Html5Qrcode("reader-hidden");
+      const decodedText = await html5Qrcode.scanFile(file, true);
+      setTicketCode(decodedText);
+      handleVerify(decodedText);
+    } catch (err) {
+      toast.error('Could not read QR code from image');
+    } finally {
+      setCameraLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,31 +114,43 @@ const CheckIn: React.FC = () => {
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto">
       <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
           <div>
             <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
               <FontAwesomeIcon icon={faTicketAlt} className="text-indigo-600" />
               Staff Check-In
             </h2>
-            <p className="text-gray-500 mt-1">Scan or type the ticket number to verify the booking.</p>
+            <p className="text-gray-500 mt-1">Scan (camera/upload) or type the ticket number to verify.</p>
           </div>
           
-          {startScanning ? (
-            <button onClick={handleStopScanning} className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-red-200">
-              <FontAwesomeIcon icon={faStopCircle} /> Stop Camera
-            </button>
-          ) : (
-            <button onClick={handleStartScanning} disabled={cameraLoading} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-indigo-100">
-              {cameraLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : <FontAwesomeIcon icon={faCamera} />} Scan QR Code
-            </button>
-          )}
+          <div className="flex gap-2">
+            {startScanning ? (
+              <button onClick={handleStopScanning} className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-red-200">
+                <FontAwesomeIcon icon={faStopCircle} /> Stop
+              </button>
+            ) : (
+              <>
+                <button onClick={handleStartScanning} disabled={cameraLoading} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-indigo-100">
+                  {cameraLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : <FontAwesomeIcon icon={faCamera} />} Camera
+                </button>
+                <button onClick={() => fileInputRef.current?.click()} disabled={cameraLoading} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-indigo-100">
+                  <FontAwesomeIcon icon={faUpload} /> Upload
+                </button>
+                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+              </>
+            )}
+          </div>
         </div>
 
+        {/* Camera Area */}
         {startScanning && (
           <div className="mb-6 border-2 border-dashed border-indigo-200 rounded-xl overflow-hidden p-2 bg-gray-50 flex justify-center">
             <div id={qrRegionId} className="w-full max-w-sm rounded-lg"></div>
           </div>
         )}
+        
+        {/* Hidden area for file scanning */}
+        <div id="reader-hidden" className="hidden"></div>
 
         <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
