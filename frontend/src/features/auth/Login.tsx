@@ -39,7 +39,13 @@ const Login: React.FC = () => {
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       setUser(data.user);
-      navigate(data.user.role === 'admin' ? '/admin' : '/user');
+
+      // ✅ Redirect based on new supervisor roles
+      if (data.user.role === 'admin') navigate('/admin');
+      else if (data.user.role === 'staff') navigate('/staff');
+      else if (data.user.role === 'finance') navigate('/finance');
+      else navigate('/user');
+      
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password');
     } finally {
@@ -79,9 +85,9 @@ const Login: React.FC = () => {
             </div>
             <div className="leading-tight">
               <p className="text-xs font-extrabold tracking-widest" style={{ color: '#C6AA58' }}>
-                NATIONAL LIBRARY SERVICES
+                BLANTYRE REGIONAL BRANCH LIBRARY
               </p>
-              <p className="text-2xl font-extrabold text-blue-900">LIBRARYSEAT</p>
+              <p className="text-2xl font-extrabold text-blue-900">e-ticketing system</p>
             </div>
           </div>
 
@@ -203,7 +209,7 @@ const Login: React.FC = () => {
           <div className="flex-1 flex flex-col justify-center items-center text-center z-10">
             <h2 className="text-4xl font-extrabold mb-6">Book Your Seat</h2>
             <p className="text-blue-100 text-lg max-w-xs mb-10 font-medium">
-              Reserve your spot at the National Library Services in seconds.
+              Reserve your spot at the Blantyre Regional Branch Library in seconds.
             </p>
             <div className="relative">
               <div className="absolute -inset-4 rounded-full bg-blue-400 opacity-20 animate-pulse" />
@@ -225,7 +231,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="text-sm text-blue-200 text-center z-10 mt-8">
-            © 2026 National Library Services. All rights reserved.
+            © 2026 Blantyre Regional Branch Library. All rights reserved.
           </div>
         </div>
       </div>

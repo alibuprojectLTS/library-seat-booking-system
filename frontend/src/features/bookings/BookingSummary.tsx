@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowLeft,
   faArrowRight,
-  faUser,
   faChair,
   faCalendarAlt,
   faWallet,
@@ -32,14 +31,12 @@ const BookingSummary: React.FC = () => {
 
   const [seats, setSeats] = useState<Seat[]>([]);
   const [section, setSection] = useState<Section | null>(null);
-  const [occupants, setOccupants] = useState<string[]>([]);
   const [bookingDate, setBookingDate] = useState<string>(
     new Date().toISOString().split('T')[0]
   );
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Load seats + section from API
   useEffect(() => {
     if (!state?.seatIds || !state?.sectionId) {
       toast.error('No seats selected. Redirecting...');
@@ -62,7 +59,6 @@ const BookingSummary: React.FC = () => {
 
         setSection(sec);
         setSeats(picked);
-        setOccupants(picked.map(() => ''));
       } catch {
         toast.error('Failed to load booking details');
       } finally {
@@ -73,29 +69,17 @@ const BookingSummary: React.FC = () => {
     load();
   }, [state, navigate]);
 
-  const handleOccupantChange = (idx: number, value: string) => {
-    setOccupants((prev) => {
-      const next = [...prev];
-      next[idx] = value;
-      return next;
-    });
-  };
-
   const totalAmount = seats.length * (section?.price_per_seat || 0);
 
   const handleProceed = async () => {
-    if (occupants.some((o) => !o.trim())) {
-      toast.error('Please enter all occupant names');
-      return;
-    }
-
     try {
       setSubmitting(true);
 
+      // ✅ Occupants removed. Sending empty array or handled natively by backend.
       const payload = {
         booking_date: bookingDate,
         seats: seats.map((s) => s.seat_id),
-        occupants,
+        occupants: [], // Backend will handle seat allocation without occupant names
       };
 
       const { data } = await apiClient.post('/bookings', payload);
@@ -132,7 +116,6 @@ const BookingSummary: React.FC = () => {
     <AnimatedBackground>
       <div className="p-4 md:p-6 pb-16">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
             <button
               onClick={() => navigate('/seats')}
@@ -145,13 +128,11 @@ const BookingSummary: React.FC = () => {
               Booking Summary
             </h1>
             <p className="text-gray-700 text-lg font-semibold mt-2">
-              Review your booking and enter occupant details.
+              Review your seats and select a date.
             </p>
           </div>
 
-          {/* Booking Details */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 space-y-6">
-            {/* Section + Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 rounded-lg bg-indigo-50">
@@ -189,39 +170,6 @@ const BookingSummary: React.FC = () => {
               </div>
             </div>
 
-            {/* Occupant inputs */}
-            <div className="border-t border-gray-100 pt-6">
-              <h2 className="text-xl font-extrabold text-gray-900 mb-5">
-                Occupant Details
-              </h2>
-
-              <div className="space-y-4">
-                {seats.map((seat, idx) => (
-                  <div key={seat.seat_id}>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Seat {seat.seat_label} — Occupant Name
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className="text-indigo-400 text-base"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        value={occupants[idx]}
-                        onChange={(e) => handleOccupantChange(idx, e.target.value)}
-                        placeholder="Enter full name"
-                        className="pl-10 w-full rounded-md border border-gray-300 py-2.5 text-base font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-600 transition"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Seats list */}
             <div className="border-t border-gray-100 pt-6">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
                 Selected Seats
@@ -239,7 +187,6 @@ const BookingSummary: React.FC = () => {
             </div>
           </div>
 
-          {/* Total + CTA */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-amber-50">

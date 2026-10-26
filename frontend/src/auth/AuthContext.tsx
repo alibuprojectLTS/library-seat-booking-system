@@ -1,9 +1,10 @@
 import { createContext, useContext } from 'react';
 
-export type UserRole = 'user' | 'admin';
+// ✅ Added 'staff' and 'finance' here
+export type UserRole = 'user' | 'admin' | 'staff' | 'finance';
 
 export interface User {
-  id: number;
+  user_id: number;
   first_name: string;
   last_name: string;
   email: string;
