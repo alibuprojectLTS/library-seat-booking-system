@@ -1,6 +1,6 @@
-# Library Seat Booking System - Backend API
+# Blantyre Regional Branch Library e-ticketing system - Backend API
 
-A robust RESTful API for managing library seat bookings, built with Node.js, Express, and PostgreSQL.
+A robust RESTful API for managing library seat bookings, POS cash tickets, check-ins, and financial reporting. Built with Node.js, Express, and PostgreSQL.
 
 ---
 
@@ -13,90 +13,83 @@ A robust RESTful API for managing library seat bookings, built with Node.js, Exp
 | PostgreSQL | Database |
 | Sequelize | ORM |
 | JWT | Authentication |
+| Brevo API | Email Delivery |
+| PayChangu | Online Payments |
 | Swagger | API Documentation |
 | Docker | Containerization |
 
 ---
 
 ## 📁 Project Structure
+
+```text
 Backend/
 ├── src/
-│ ├── config/
-│ │ ├── database.js
-│ │ ├── swagger.js
-│ │ └── passport.js
-│ ├── controllers/
-│ │ ├── adminController.js
-│ │ ├── announcementController.js
-│ │ ├── authController.js
-│ │ ├── bookingController.js
-│ │ ├── csvController.js
-│ │ ├── paymentController.js
-│ │ ├── queryController.js
-│ │ ├── seatController.js
-│ │ ├── statusController.js
-│ │ ├── ticketController.js
-│ │ └── userController.js
-│ ├── middleware/
-│ │ ├── admin.js
-│ │ ├── auth.js
-│ │ ├── errorHandler.js
-│ │ ├── rateLimiter.js
-│ │ ├── upload.js
-│ │ └── validation.js
-│ ├── models/
-│ │ ├── index.js
-│ │ ├── Announcement.js
-│ │ ├── Booking.js
-│ │ ├── BookingItem.js
-│ │ ├── LibrarySection.js
-│ │ ├── LibraryStatus.js
-│ │ ├── NewsletterSubscription.js
-│ │ ├── Notification.js
-│ │ ├── Payment.js
-│ │ ├── Query.js
-│ │ ├── QueryReply.js
-│ │ ├── Seat.js
-│ │ ├── Ticket.js
-│ │ └── User.js
-│ ├── routes/
-│ │ ├── index.js
-│ │ ├── adminRoutes.js
-│ │ ├── announcementRoutes.js
-│ │ ├── authRoutes.js
-│ │ ├── bookingRoutes.js
-│ │ ├── paymentRoutes.js
-│ │ ├── queryRoutes.js
-│ │ ├── seatRoutes.js
-│ │ ├── statusRoutes.js
-│ │ ├── ticketRoutes.js
-│ │ └── userRoutes.js
-│ ├── services/
-│ │ ├── csvService.js
-│ │ ├── emailService.js
-│ │ ├── notificationService.js
-│ │ ├── paymentService.js
-│ │ └── qrService.js
-│ ├── utils/
-│ │ ├── constants.js
-│ │ ├── helpers.js
-│ │ ├── logger.js
-│ │ └── response.js
-│ ├── validators/
-│ │ ├── authValidator.js
-│ │ ├── bookingValidator.js
-│ │ ├── queryValidator.js
-│ │ └── seatValidator.js
-│ └── index.js
-├── uploads/
-├── logs/
-├── .env
-├── .gitignore
-├── docker-compose.yml
-├── Dockerfile
-├── package.json
-├── package-lock.json
-└── README.md
+│   ├── config/
+│   │   ├── database.js
+│   │   └── swagger.js
+│   ├── controllers/
+│   │   ├── adminController.js
+│   │   ├── announcementController.js
+│   │   ├── authController.js
+│   │   ├── bookingController.js
+│   │   ├── csvController.js
+│   │   ├── financeController.js      # NEW: Reports & Refunds
+│   │   ├── paymentController.js
+│   │   ├── queryController.js
+│   │   ├── seatController.js
+│   │   ├── staffController.js        # NEW: POS & Check-in
+│   │   ├── statusController.js
+│   │   ├── ticketController.js
+│   │   └── userController.js
+│   ├── middleware/
+│   │   ├── admin.js
+│   │   ├── auth.js                   # UPDATED: isStaff, isFinance
+│   │   ├── errorHandler.js
+│   │   ├── rateLimiter.js
+│   │   ├── upload.js
+│   │   └── validation.js
+│   ├── models/
+│   │   ├── index.js
+│   │   ├── Announcement.js
+│   │   ├── Booking.js                # UPDATED: payment_method
+│   │   ├── BookingItem.js
+│   │   ├── LibrarySection.js
+│   │   ├── LibraryStatus.js
+│   │   ├── NewsletterSubscription.js
+│   │   ├── Notification.js
+│   │   ├── Payment.js
+│   │   ├── Query.js
+│   │   ├── QueryReply.js
+│   │   ├── Seat.js
+│   │   ├── Ticket.js                 # UPDATED: checked_in
+│   │   └── User.js                   # UPDATED: staff, finance roles
+│   ├── routes/
+│   │   ├── index.js                  # UPDATED: staff, finance
+│   │   ├── adminRoutes.js
+│   │   ├── announcementRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── bookingRoutes.js
+│   │   ├── financeRoutes.js          # NEW
+│   │   ├── paymentRoutes.js
+│   │   ├── queryRoutes.js
+│   │   ├── seatRoutes.js
+│   │   ├── staffRoutes.js            # NEW
+│   │   ├── statusRoutes.js
+│   │   ├── ticketRoutes.js
+│   │   └── userRoutes.js
+│   ├── services/
+│   │   ├── csvService.js
+│   │   ├── emailService.js
+│   │   ├── notificationService.js
+│   │   ├── paymentService.js
+│   │   └── qrService.js
+│   ├── utils/
+│   │   ├── constants.js
+│   │   ├── helpers.js
+│   │   ├── logger.js
+│   │   └── response.js
+│   └── index.js
 
 ---
 
@@ -178,172 +171,78 @@ bash
 npm run dev
 
 
-🎯 COMPLETE SYSTEM FLOW
+🎯  COMPLETE SYSTEM FLOW
 1. Public Home Page (No Login)
-A visitor accesses the system and sees a public home page featuring a navigation bar with logo, Home, Book Seats, About, and Contact links, along with Login and Register buttons. The page displays announcements posted by administrators, real-time library status showing open/closed state, capacity utilization, availability per section, open hours, and any admin messages. The how-to-use section guides visitors through the four-step booking process: register, select seats, pay online, and receive tickets. There is also a newsletter subscription section, partners section, and a footer with address and social media links. Importantly, the interactive seat map is not shown on the public home page — users can only see general section information until they log in.
+A visitor accesses the public home page featuring the new NLS branding, live stats, and hero section. The announcements bar displays notices, and the library status section shows real-time info (Open/Closed/Full/Maintenance). Users can view sections but must log in to book.
 
 2. Registration / Login
-When a visitor decides to book, they click Login or Register. New users register using email and password or Google OAuth, while returning users login using email/password or Google. The system verifies credentials, checks the user role, and generates a JWT token. Users with role user are redirected to their User Dashboard, while users with role admin are redirected to the Admin Dashboard.
+Users register/login via email. The system verifies credentials and redirects based on role:
 
-3. User Dashboard
-The user dashboard shows statistics including total bookings, active tickets, total amount spent, and upcoming bookings. It also displays today's active tickets with details and quick actions such as booking new seats, viewing all tickets, editing profile, submitting support queries, and viewing notifications.
+user → User Dashboard
 
-4. Interactive Seat Map & Booking
-From the dashboard, the logged-in user clicks Book Seats to access the interactive seat map. The seat map shows three sections (Computer, General, Discussion) with color-coded seats: green (available), red (booked), and grey (deactivated). The user selects up to 5 seats, enters occupant names for each seat, reviews the booking summary showing section, seat numbers, occupant names, booking date, and total amount, then confirms and proceeds to payment.
+admin → Admin Dashboard
 
-5. Payment & Confirmation
-The user is redirected to PayChangu secure payment. Upon successful payment, the system automatically generates a unique ticket code with a QR code, sends an email receipt with booking details to the user's registered email address, creates an in-app notification, and redirects to a confirmation page. The user can view all tickets in their dashboard, which displays statistics, active tickets, and upcoming bookings.
+staff → Staff POS & Check-in Dashboard
 
-6. Library Entry / Check-In
-When the user arrives at the library, they present their ticket either by showing the email receipt on their phone, displaying the ticket from their dashboard, or providing a printed copy. Library staff verify the ticket using either QR code scanning (which automatically validates the booking and checks the user in) or manual search in the admin dashboard using the user's name, seat number, or booking ID. Once verified, the staff confirms check-in, the seat status updates to occupied, and the user proceeds to their booked seat. When leaving, the staff checks the user out, making the seat available again.
+finance → Financial Reports Dashboard
 
-7. Admin Dashboard
-Administrators login through the same login page and are redirected to the admin dashboard based on their role. The admin dashboard provides live statistics and quick actions for managing seats manually or through CSV upload, managing users by deleting those inactive for over seven days, posting announcements that appear on the home page, updating library status that instantly reflects on the home page, managing queries by replying and changing status, processing refunds, and accessing reports on peak hours, revenue, seat popularity, no-shows, and user activity.
+3. Online Booking (User)
+Users select seats (across multiple sections in one session), review the summary, and pay via PayChangu. Upon payment, a ticket with a QR code is generated and emailed to the user.
 
-8. Query & Support System
-Users submit queries through their dashboard by providing subject, category, priority, and message. Admins view, filter, and reply to queries, changing status as issues are resolved. Users receive email notifications when their queries are replied to and can view complete conversations in their support section. Admins can also add internal notes not visible to users.
+4. Point of Sale / Cash Ticketing (Staff)
+Library staff log into the Staff Dashboard and use the POS Portal. They select seats on the map, enter the occupant's name and email, and confirm cash received. The system generates a paid ticket and emails it immediately without calling PayChangu.
 
-9. Announcements & Library Status
-Admins create announcements (general, urgent, holiday, maintenance, promotional) and update library status (open, full, closed, maintenance). These instantly reflect on the public home page and are visible to all visitors.
+5. Check-In (Staff)
+When a user arrives, staff use the Check-In portal. They can search by ticket number or view the day's bookings. Once verified, they click check-in, which marks the ticket as checked_in in the database.
+
+6. Financial Reports (Finance Officer)
+The Financial Officer logs in to view daily, weekly, and monthly revenue reports, separated by Online (PayChangu) and Cash (POS) payments.
 
 📚 API Endpoints
 🔐 Authentication
 Method	Endpoint	Description	Auth
-POST	/api/auth/register	Register a new user	❌
+POST	/api/auth/register	Register user	❌
 POST	/api/auth/login	Login user	❌
-GET	/api/auth/me	Get current user profile	✅
-🏛️ Library Status
+GET	/api/auth/me	Get current user	✅
+🪑 Seats & Sections
 Method	Endpoint	Description	Auth
-GET	/api/status	Get library open/closed status, capacity, and message	❌
-🪑 Seats
+GET	/api/seats/sections	Get active sections	❌
+GET	/api/seats/sections/:id/seats	Get seats by section	✅
+📅 Bookings (User)
 Method	Endpoint	Description	Auth
-GET	/api/seats/sections	Get all library sections (Computer, General, Discussion)	❌
-GET	/api/seats/sections/:id/seats	Get seats by section with status	✅
-GET	/api/seats/status	Get real-time seat availability	✅
-📅 Bookings
+POST	/api/bookings	Create online booking	✅ User
+GET	/api/bookings/my	Get user's bookings	✅ User
+DELETE	/api/bookings/:id/cancel	Cancel booking	✅ User
+🧾 Staff (POS & Check-In)
 Method	Endpoint	Description	Auth
-POST	/api/bookings	Create booking (max 5 seats)	✅
-GET	/api/bookings/my	Get user's bookings	✅
-GET	/api/bookings/:id	Get single booking details	✅
-DELETE	/api/bookings/:id/cancel	Cancel a booking	✅
-💳 Payments
+POST	/api/staff/pos-booking	Create cash booking & issue ticket	✅ Staff
+POST	/api/staff/checkin	Verify and check-in a ticket	✅ Staff
+💰 Finance
 Method	Endpoint	Description	Auth
-POST	/api/payments/initiate	Initiate PayChangu payment	✅
-GET	/api/payments/verify/:txRef	Verify payment status	✅
-GET	/api/payments/history	Get user's payment history	✅
-POST/GET	/api/payments/webhook	PayChangu webhook callback	❌
-🎫 Tickets
-Method	Endpoint	Description	Auth
-GET	/api/tickets/my	Get user's tickets	✅
-GET	/api/tickets/:id	Get single ticket with QR code	✅
-💬 Queries
-Method	Endpoint	Description	Auth
-POST	/api/queries	Submit a query	✅
-GET	/api/queries/my	Get user's queries	✅
+GET	/api/finance/reports	Get revenue reports (Daily/Weekly/Monthly)	✅ Finance
 👑 Admin
 Method	Endpoint	Description	Auth
-GET	/api/admin/dashboard	Admin dashboard stats	✅ Admin
-GET	/api/admin/queries	Get all queries	✅ Admin
-POST	/api/admin/queries/:id/reply	Reply to a query	✅ Admin
-DELETE	/api/admin/users/inactive	Delete inactive users	✅ Admin
+GET	/api/admin/dashboard	Admin metrics	✅ Admin
+POST	/api/admin/seats	Add seat manually	✅ Admin
+POST	/api/admin/seats/csv	Bulk CSV upload	✅ Admin
 POST	/api/admin/announcements	Post announcement	✅ Admin
 PUT	/api/admin/status	Update library status	✅ Admin
-POST	/api/admin/seats	Add seat manually	✅ Admin
-PUT	/api/admin/seats/:id	Update seat	✅ Admin
-DELETE	/api/admin/seats/:id	Delete seat	✅ Admin
-POST	/api/admin/seats/csv	Upload seats via CSV	✅ Admin
-POST	/api/admin/checkin	Verify QR and check in user	✅ Admin
-POST	/api/admin/checkout	Check out user	✅ Admin
-GET	/api/admin/bookings/search	Search bookings by seat, occupant, or user	✅ Admin
-📖 How Each Endpoint Works
-🔐 Authentication
-POST /api/auth/register — Creates a new user with email and password. Phone is optional.
-
-POST /api/auth/login — Verifies credentials and returns a JWT token for authenticated requests.
-
-GET /api/auth/me — Returns the logged-in user's profile using the JWT token.
-
-🏛️ Library Status
-GET /api/status — Returns the current library state (open/full/closed/maintenance), capacity used/total, open hours, and any admin message.
-
-🪑 Seats
-GET /api/seats/sections — Returns all active library sections with capacity and price per seat.
-
-GET /api/seats/sections/:id/seats — Returns all seats in a given section with seat label, position, and status (available/booked/deactivated).
-
-GET /api/seats/status — Returns total, available, and booked seat counts plus occupancy percentage.
-
-📅 Bookings
-POST /api/bookings — Creates a booking for up to 5 seats. Requires booking_date, an array of seat IDs, and an array of occupant names. Marks selected seats as booked and sets a 15-minute expiry.
-
-GET /api/bookings/my — Returns all bookings for the logged-in user, including seat and occupant details.
-
-GET /api/bookings/:id — Returns a single booking by ID (only if it belongs to the logged-in user).
-
-DELETE /api/bookings/:id/cancel — Cancels a booking and releases the seats back to available.
-
-💳 Payments
-POST /api/payments/initiate — Starts a PayChangu payment session and returns the checkout URL.
-
-GET /api/payments/verify/:txRef — Verifies the payment with PayChangu, updates booking status to paid, generates a ticket with QR code, and sends an email receipt.
-
-GET /api/payments/history — Returns the user's payment history.
-
-POST/GET /api/payments/webhook — Handles PayChangu webhook notifications for automatic payment processing.
-
-🎫 Tickets
-GET /api/tickets/my — Returns all tickets belonging to the logged-in user with QR codes.
-
-GET /api/tickets/:id — Returns a single ticket with its QR code.
-
-💬 Queries
-POST /api/queries — Submits a support query with subject, message, category, and priority.
-
-GET /api/queries/my — Returns all queries submitted by the logged-in user.
-
-👑 Admin
-GET /api/admin/dashboard — Returns aggregated stats: total users, seats, bookings, pending queries, and inactive users.
-
-GET /api/admin/queries — Returns all queries, filterable by status and priority.
-
-POST /api/admin/queries/:id/reply — Sends a reply to a query and updates its status.
-
-DELETE /api/admin/users/inactive — Deactivates users who haven't logged in for 7+ days.
-
-POST /api/admin/announcements — Posts a new announcement visible on the home page.
-
-PUT /api/admin/status — Updates library status and message shown on the home page.
-
-POST /api/admin/seats — Adds a seat manually.
-
-PUT /api/admin/seats/:id — Updates seat details.
-
-DELETE /api/admin/seats/:id — Deletes a seat.
-
-POST /api/admin/seats/csv — Uploads seats via CSV file.
-
-POST /api/admin/checkin — Verifies a ticket by QR code and checks the user in.
-
-POST /api/admin/checkout — Checks the user out and releases the seat.
-
-GET /api/admin/bookings/search — Searches bookings by seat label, occupant name, booking ID, or user email.
-
-📚 API Documentation
-Once the server is running, Swagger documentation is available at:
-
-text
-http://localhost:5000/api-docs
-
 🐳 Docker Setup
-1. Start with Docker Compose
+Start with Docker Compose
+
 bash
 docker-compose up -d
-2. Stop containers
+Stop containers
+
 bash
 docker-compose down
-📋 Admin Credentials
+📋 Credentials
 Email	Password	Role
 admin@library.com	FGBROC	Admin
+staff@library.com	(set in DB)	Staff
+finance@library.com	(set in DB)	Finance
+(Note: To create Staff and Finance accounts, update the role column in the users table for those specific users).
+
 📝 Common Commands
 Command	Description
 npm run dev	Start development server
@@ -356,5 +255,3 @@ MIT
 alibuprojectLTS
 
 GitHub: @alibuprojectLTS
-
-Email: alibuprojectlts@gmail.com
