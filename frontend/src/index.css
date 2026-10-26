@@ -1,3 +1,4 @@
+/* stylelint-disable */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -116,5 +117,24 @@ html { scroll-behavior: smooth; }
   .hp-navLink, .btn-modern, .reveal, .card-hover, .img-hover img {
     transition: none !important;
     animation: none !important;
+  }
+}
+
+@media print {
+  /* Hide the sidebar, topbar, and buttons */
+  aside, header, button, .print\:hidden {
+    display: none !important;
+  }
+  
+  /* Make the main content take full width */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Make sure the background is white for printing */
+  body {
+    background-color: white !important;
   }
 }
