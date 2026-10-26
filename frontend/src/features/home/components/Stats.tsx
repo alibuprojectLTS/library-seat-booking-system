@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Users, MapPin, Award, BookOpen } from 'lucide-react';
-import apiClient from '../../../api/core/apiClient';
 
 interface StatItem {
   icon: React.FC<{ className?: string }>;
@@ -10,34 +9,16 @@ interface StatItem {
 }
 
 const Stats: React.FC = () => {
-  const [stats, setStats] = useState<StatItem[]>([
-    { icon: Users, number: 0, label: 'Total Seats', suffix: '+' },
-    { icon: MapPin, number: 0, label: 'Library Sections', suffix: '' },
-    { icon: Award, number: 0, label: 'Bookings Made', suffix: '+' },
-    { icon: BookOpen, number: 24, label: 'Hours Weekly', suffix: '' },
+  // ✅ Exact stats from the supervisor's document
+  const [stats] = useState<StatItem[]>([
+    { icon: Users, number: 200, label: 'Average Daily Users', suffix: '+' },
+    { icon: MapPin, number: 2210, label: 'Registered Members', suffix: '+' },
+    { icon: Award, number: 1000, label: 'Physical & Digital Resources', suffix: '' }, // Using 1000 to represent "Thousands"
+    { icon: BookOpen, number: 49, label: 'Hours/Week', suffix: '' },
   ]);
 
   const [counts, setCounts] = useState([0, 0, 0, 0]);
 
-  // Fetch real stats
-  useEffect(() => {
-    apiClient
-      .get('/status/stats')
-      .then(({ data }) => {
-        if (!data?.stats) return;
-        const { totalSeats, totalSections, totalBookings, hoursWeekly } = data.stats;
-
-        setStats([
-          { icon: Users, number: totalSeats ?? 0, label: 'Total Seats', suffix: '+' },
-          { icon: MapPin, number: totalSections ?? 0, label: 'Library Sections', suffix: '' },
-          { icon: Award, number: totalBookings ?? 0, label: 'Bookings Made', suffix: '+' },
-          { icon: BookOpen, number: hoursWeekly ?? 24, label: 'Hours Weekly', suffix: '' },
-        ]);
-      })
-      .catch(() => {});
-  }, []);
-
-  // Animate counters when stats update
   useEffect(() => {
     const timers: ReturnType<typeof setInterval>[] = [];
     setCounts(stats.map(() => 0));
@@ -64,21 +45,21 @@ const Stats: React.FC = () => {
   }, [stats]);
 
   return (
-    <section className="bg-blue-600 text-white">
-      <div className="mx-auto max-w-7xl px-4 py-10">
+    <section className="text-white" style={{ backgroundColor: '#082845' }}>
+      <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
               <div key={index} className="text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <IconComponent className="w-7 h-7 mr-2 text-yellow-300" />
-                  <span className="text-3xl font-extrabold">
-                    {counts[index]}
-                    {stat.suffix}
+                  <IconComponent className="w-7 h-7 mr-2 text-[#C6AA58]" /> {/* Gold color */}
+                  <span className="text-3xl md:text-4xl font-extrabold">
+                    {stat.label === 'Physical & Digital Resources' && counts[index] === 1000 ? 'Thousands of' : counts[index]}
+                    {stat.label !== 'Physical & Digital Resources' && stat.suffix}
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-blue-100">{stat.label}</p>
+                <p className="text-sm font-semibold text-gray-300">{stat.label}</p>
               </div>
             );
           })}
