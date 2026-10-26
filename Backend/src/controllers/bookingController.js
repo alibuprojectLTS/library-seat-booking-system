@@ -1,27 +1,19 @@
-import { Booking, BookingItem, Seat, LibrarySection } from '../models/index.js';
+import { Booking, BookingItem, Seat, LibrarySection, User } from '../models/index.js';
 import { sequelize } from '../models/index.js';
 
 export const createBooking = async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const { booking_date, seats, occupants } = req.body;
+    const { booking_date, seats } = req.body;
     const userId = req.user.userId;
 
     // Validation
-    if (!booking_date || !seats || !occupants) {
+    if (!booking_date || !seats || seats.length === 0) {
       await transaction.rollback();
       return res.status(400).json({
         success: false,
-        message: 'booking_date, seats, and occupants are required'
-      });
-    }
-
-    if (seats.length !== occupants.length) {
-      await transaction.rollback();
-      return res.status(400).json({
-        success: false,
-        message: 'Number of seats must match number of occupants'
+        message: 'booking_date and seats are required'
       });
     }
 
@@ -45,6 +37,10 @@ export const createBooking = async (req, res) => {
       }
     }
 
+    // ✅ Fetch the user's name to automatically attach to the seats
+    const user = await User.findByPk(userId, { transaction });
+    const autoOccupantName = user ? `${user.first_name} ${user.last_name}` : 'Online User';
+
     // Calculate total amount
     const totalAmount = seats.length * 200;
 
@@ -63,7 +59,7 @@ export const createBooking = async (req, res) => {
       await BookingItem.create({
         booking_id: booking.booking_id,
         seat_id: seats[i],
-        occupant_name: occupants[i]
+        occupant_name: autoOccupantName // ✅ Automatically attached!
       }, { transaction });
 
       await Seat.update(

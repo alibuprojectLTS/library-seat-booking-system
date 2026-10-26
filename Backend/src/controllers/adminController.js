@@ -1,4 +1,4 @@
-import { User, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat } from '../models/index.js';
+import { User,LibrarySection, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat } from '../models/index.js';
 import { Op } from 'sequelize';
 
 /**
@@ -495,3 +495,59 @@ export const deleteSeat = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get all users (Admin)
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['user_id', 'first_name', 'last_name', 'email', 'role', 'last_login', 'is_active'],
+      order: [['created_at', 'DESC']]
+    });
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Get all users error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch users' });
+  }
+};
+
+/**
+ * Get all sections with prices (Admin)
+ */
+export const getAllSectionsAdmin = async (req, res) => {
+  try {
+    const sections = await LibrarySection.findAll({
+      order: [['section_id', 'ASC']]
+    });
+    res.json({ success: true, sections });
+  } catch (error) {
+    console.error('Get sections error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch sections' });
+  }
+};
+
+/**
+ * Update section price (Admin)
+ */
+export const updateSectionPrice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price_per_seat } = req.body;
+
+    const section = await LibrarySection.findByPk(id);
+    if (!section) {
+      return res.status(404).json({ success: false, message: 'Section not found' });
+    }
+
+    await section.update({ price_per_seat });
+    
+    res.json({ success: true, message: 'Price updated successfully', section });
+  } catch (error) {
+    console.error('Update price error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update price' });
+  }
+};
+
+// ✅ Make sure to import LibrarySection at the top:
+// import { User, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat, LibrarySection } from '../models/index.js';

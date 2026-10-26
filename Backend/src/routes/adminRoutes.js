@@ -4,6 +4,7 @@ import {
   getAllQueries,
   replyToQuery,
   deleteInactiveUsers,
+  getAllUsers, // ✅ NEW
   createAnnouncement,
   getAllAnnouncementsAdmin,
   updateAnnouncementAdmin,
@@ -11,7 +12,9 @@ import {
   updateLibraryStatus,
   addSeat,
   updateSeat,
-  deleteSeat
+  deleteSeat,
+  getAllSectionsAdmin, // ✅ NEW
+  updateSectionPrice   // ✅ NEW
 } from '../controllers/adminController.js';
 import { uploadSeatsCSV } from '../controllers/csvController.js';
 import { authenticate, isAdmin } from '../middleware/auth.js';
@@ -19,7 +22,6 @@ import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-// All admin routes require authentication + admin role
 router.use(authenticate);
 router.use(isAdmin);
 
@@ -31,7 +33,12 @@ router.get('/queries', getAllQueries);
 router.post('/queries/:id/reply', replyToQuery);
 
 // Users
+router.get('/users', getAllUsers); // ✅ NEW
 router.delete('/users/inactive', deleteInactiveUsers);
+
+// Sections & Pricing
+router.get('/sections', getAllSectionsAdmin); // ✅ NEW
+router.put('/sections/:id/price', updateSectionPrice); // ✅ NEW
 
 // Announcements
 router.get('/announcements', getAllAnnouncementsAdmin);

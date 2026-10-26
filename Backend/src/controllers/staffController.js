@@ -78,10 +78,12 @@ export const processPOSBooking = async (req, res) => {
 
     await transaction.commit();
 
-    // 6. Send Email (Async - uses your exact Brevo function)
-    // We pass the created booking, ticket, user, and seat records to the email service
-    sendBookingConfirmation(user, booking, ticket, seatRecords)
-      .catch(err => console.error('POS Email error:', err));
+    // ✅ 6. Send Email (Async - confirmed)
+    if (occupant_email) {
+      sendBookingConfirmation(user, booking, ticket, seatRecords)
+        .then(() => console.log(`✅ POS Ticket email sent successfully to ${occupant_email}`))
+        .catch(err => console.error('❌ POS Email error:', err));
+    }
 
     res.json({
       success: true,
