@@ -1,49 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faCheckCircle, faTicketAlt, faSpinner, faCamera, faStopCircle } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import apiClient from '../../../../api/core/apiClient';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 
 const CheckIn: React.FC = () => {
   const [ticketCode, setTicketCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [scanMode, setScanMode] = useState(false);
-
-  useEffect(() => {
-    if (!scanMode) return;
-
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      /* verbose= */ false
-    );
-
-    scanner.render(
-      // ✅ Added : string to fix TypeScript error
-      (text: string) => {
-        scanner.clear();
-        setScanMode(false);
-        setTicketCode(text);
-        handleVerify(text);
-      },
-      // ✅ Removed unused 'error' parameter
-      () => {}
-    );
-
-    return () => {
-      scanner.clear().catch(console.error);
-    };
-  }, [scanMode]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ticketCode) return;
-    handleVerify(ticketCode);
-  };
+  const [startScanning, setStartScanning] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  
+  const html5QrcodeRef = useRef<Html5Qrcode | null>(null);
+  const pluginStateRef = useRef<string>('initial');
+  const qrRegionId = "reader";
 
   const handleVerify = async (code: string) => {
+    if (!code) return;
     setLoading(true);
     setSuccess(false);
     try {
@@ -60,6 +34,73 @@ const CheckIn: React.FC = () => {
     }
   };
 
+  const handleStartScanning = async () => {
+    if ("vibrate" in navigator) navigator.vibrate(50);
+    setCameraLoading(true);
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length) {
+        setStartScanning(true);
+      } else {
+        toast.error('No camera found on this device.');
+      }
+    } catch (err) {
+      toast.error('Camera permission denied.');
+    } finally {
+      setCameraLoading(false);
+    }
+  };
+
+  const handleStopScanning = () => {
+    if ("vibrate" in navigator) navigator.vibrate(50);
+    setStartScanning(false);
+  };
+
+  useEffect(() => {
+    if (!startScanning) return;
+    if (!html5QrcodeRef.current) {
+      html5QrcodeRef.current = new Html5Qrcode(qrRegionId);
+    }
+
+    if (pluginStateRef.current !== 'starting') {
+      pluginStateRef.current = 'starting';
+      html5QrcodeRef.current.start(
+        { facingMode: "environment" },
+        // ✅ Removed supportedScanTypes from here to fix the TS error
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        async (text) => {
+          if (html5QrcodeRef.current?.getState() === Html5QrcodeScannerState.SCANNING) {
+            html5QrcodeRef.current?.pause(true);
+          }
+          if ("vibrate" in navigator) navigator.vibrate(150);
+          setTicketCode(text);
+          setStartScanning(false);
+          handleVerify(text);
+        },
+        () => { /* ignore scan errors */ }
+      ).then(() => {
+        pluginStateRef.current = 'started';
+      }).catch(() => {
+        toast.error("Camera failed to start");
+        setStartScanning(false);
+      });
+    }
+
+    return () => {
+      if (html5QrcodeRef.current && pluginStateRef.current !== 'starting') {
+        html5QrcodeRef.current.stop().then(() => {
+          pluginStateRef.current = 'initial';
+        }).catch(console.error);
+      }
+    };
+  }, [startScanning]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticketCode) return;
+    handleVerify(ticketCode);
+  };
+
   return (
     <div className="p-4 md:p-6 max-w-3xl mx-auto">
       <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
@@ -71,20 +112,21 @@ const CheckIn: React.FC = () => {
             </h2>
             <p className="text-gray-500 mt-1">Scan or type the ticket number to verify the booking.</p>
           </div>
-          <button
-            onClick={() => setScanMode(!scanMode)}
-            className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition ${
-              scanMode ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-            }`}
-          >
-            <FontAwesomeIcon icon={scanMode ? faStopCircle : faCamera} />
-            {scanMode ? 'Stop Camera' : 'Scan QR Code'}
-          </button>
+          
+          {startScanning ? (
+            <button onClick={handleStopScanning} className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-red-200">
+              <FontAwesomeIcon icon={faStopCircle} /> Stop Camera
+            </button>
+          ) : (
+            <button onClick={handleStartScanning} disabled={cameraLoading} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-bold flex items-center gap-2 transition hover:bg-indigo-100">
+              {cameraLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : <FontAwesomeIcon icon={faCamera} />} Scan QR Code
+            </button>
+          )}
         </div>
 
-        {scanMode && (
-          <div className="mb-6 border-2 border-dashed border-indigo-200 rounded-xl overflow-hidden p-2 bg-gray-50">
-            <div id="reader" className="w-full max-w-sm mx-auto"></div>
+        {startScanning && (
+          <div className="mb-6 border-2 border-dashed border-indigo-200 rounded-xl overflow-hidden p-2 bg-gray-50 flex justify-center">
+            <div id={qrRegionId} className="w-full max-w-sm rounded-lg"></div>
           </div>
         )}
 
