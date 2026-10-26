@@ -1,4 +1,4 @@
-import { User,LibrarySection, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat } from '../models/index.js';
+import { User,LibrarySection, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat,BookingItem } from '../models/index.js';
 import { Op } from 'sequelize';
 
 /**
@@ -549,5 +549,40 @@ export const updateSectionPrice = async (req, res) => {
   }
 };
 
-// ✅ Make sure to import LibrarySection at the top:
-// import { User, Query, QueryReply, Announcement, LibraryStatus, Booking, Seat, LibrarySection } from '../models/index.js';
+/**
+ * Cancel Booking (Admin Override)
+ */
+export const cancelBookingAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ✅ Admin doesn't need to check user_id, they can cancel ANY booking
+    const booking = await Booking.findByPk(id, {
+      include: [BookingItem]
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    if (booking.booking_status === 'cancelled') {
+      return res.status(400).json({ success: false, message: 'Booking already cancelled' });
+    }
+
+    // Release seats
+    for (const item of booking.BookingItems) {
+      await Seat.update(
+        { seat_status: 'available' },
+        { where: { seat_id: item.seat_id } }
+      );
+    }
+
+    // Update booking status
+    await booking.update({ booking_status: 'cancelled' });
+
+    res.json({ success: true, message: 'Booking cancelled by Admin' });
+  } catch (error) {
+    console.error('Admin cancel booking error:', error);
+    res.status(500).json({ success: false, message: 'Failed to cancel booking' });
+  }
+};

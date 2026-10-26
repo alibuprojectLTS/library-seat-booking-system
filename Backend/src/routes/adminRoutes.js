@@ -1,10 +1,11 @@
 import express from 'express';
 import {
   getDashboardStats,
+  cancelBookingAdmin, // ✅ Imported
   getAllQueries,
   replyToQuery,
   deleteInactiveUsers,
-  getAllUsers, // ✅ NEW
+  getAllUsers,
   createAnnouncement,
   getAllAnnouncementsAdmin,
   updateAnnouncementAdmin,
@@ -13,8 +14,8 @@ import {
   addSeat,
   updateSeat,
   deleteSeat,
-  getAllSectionsAdmin, // ✅ NEW
-  updateSectionPrice   // ✅ NEW
+  getAllSectionsAdmin,
+  updateSectionPrice
 } from '../controllers/adminController.js';
 import { uploadSeatsCSV } from '../controllers/csvController.js';
 import { authenticate, isAdmin } from '../middleware/auth.js';
@@ -28,17 +29,20 @@ router.use(isAdmin);
 // Dashboard
 router.get('/dashboard', getDashboardStats);
 
+// ✅ Bookings (Admin Override)
+router.delete('/bookings/:id/cancel', cancelBookingAdmin);
+
 // Queries
 router.get('/queries', getAllQueries);
 router.post('/queries/:id/reply', replyToQuery);
 
 // Users
-router.get('/users', getAllUsers); // ✅ NEW
+router.get('/users', getAllUsers);
 router.delete('/users/inactive', deleteInactiveUsers);
 
 // Sections & Pricing
-router.get('/sections', getAllSectionsAdmin); // ✅ NEW
-router.put('/sections/:id/price', updateSectionPrice); // ✅ NEW
+router.get('/sections', getAllSectionsAdmin);
+router.put('/sections/:id/price', updateSectionPrice);
 
 // Announcements
 router.get('/announcements', getAllAnnouncementsAdmin);

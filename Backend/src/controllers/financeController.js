@@ -8,7 +8,6 @@ export const getFinancialReport = async (req, res) => {
   try {
     const { period } = req.query; // 'daily', 'weekly', 'monthly'
 
-    // ✅ Calculate start date based on the period
     const now = new Date();
     let startDate = new Date();
 
@@ -18,7 +17,6 @@ export const getFinancialReport = async (req, res) => {
       startDate.setMonth(now.getMonth() - 1);
     }
     
-    // ✅ Force start time to the very beginning of the day
     startDate.setHours(0, 0, 0, 0);
 
     // 1. Get the summarized stats
@@ -39,6 +37,7 @@ export const getFinancialReport = async (req, res) => {
     });
 
     // 2. Get the detailed list of who paid
+    // We use raw: false so Sequelize maps the associations properly
     const paymentsList = await Booking.findAll({
       where: { 
         booking_status: ['paid', 'refunded'], 
@@ -77,7 +76,6 @@ export const processRefund = async (req, res) => {
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
     if (booking.booking_status !== 'paid') return res.status(400).json({ success: false, message: 'Only paid bookings can be refunded' });
 
-    // Update status to refunded
     await booking.update({ booking_status: 'refunded' });
 
     res.json({ success: true, message: 'Refund processed successfully' });
