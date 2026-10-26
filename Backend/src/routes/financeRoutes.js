@@ -1,3 +1,4 @@
+
 import express from 'express';
 import { getFinancialReport } from '../controllers/financeController.js';
 import { authenticate, isFinance } from '../middleware/auth.js';
