@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import apiClient from '../../../../api/core/apiClient';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface PaymentDetails {
   booking_id: number;
@@ -154,9 +155,15 @@ const Reports: React.FC = () => {
     setShowExport(false);
   };
 
+  // ✅ Chart Data
+  const chartData = report ? [
+    { name: 'Online', revenue: report.onlineRevenue },
+    { name: 'Cash', revenue: report.cashRevenue },
+  ] : [];
+
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
-      {/* Header & Controls - Responsive Flex */}
+      {/* Header & Controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Financial Reports</h1>
@@ -199,7 +206,7 @@ const Reports: React.FC = () => {
         </div>
       ) : report ? (
         <>
-          {/* ✅ Summary Cards - Matches Admin Dashboard Responsiveness */}
+          {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 sm:col-span-2 lg:col-span-4">
               <div className="flex items-center gap-4">
@@ -224,7 +231,23 @@ const Reports: React.FC = () => {
             </div>
           </div>
 
-          {/* ✅ Responsive Table Container */}
+          {/* ✅ NEW: Revenue Bar Chart */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h2 className="font-extrabold text-gray-900 mb-6">Revenue Breakdown</h2>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(val) => `MK ${val}`} />
+                  <Tooltip formatter={(val: any) => `MK ${Number(val).toLocaleString()}`} cursor={{ fill: '#F3F4F6' }} />
+                  <Bar dataKey="revenue" fill="#4F46E5" radius={[4, 4, 0, 0]} barSize={60} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Responsive Table Container */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-4 border-b border-gray-100 bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <h2 className="font-extrabold text-gray-900">Payment Transactions</h2>
@@ -258,7 +281,10 @@ const Reports: React.FC = () => {
                       </td>
                       <td className="px-4 py-3 text-sm font-bold text-gray-800 whitespace-nowrap">MK {Number(p.total_amount).toLocaleString()}</td>
                       <td className="px-4 py-3 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${p.booking_status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${
+                          p.booking_status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 
+                          p.booking_status === 'refunded' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+                        }`}>
                           {p.booking_status}
                         </span>
                       </td>
@@ -280,7 +306,7 @@ const Reports: React.FC = () => {
         <p className="text-center text-gray-500 py-10">No report data available.</p>
       )}
 
-      {/* ✅ Refund Confirmation Modal */}
+      {/* Refund Confirmation Modal */}
       {refundId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !processingRefund && setRefundId(null)} />
