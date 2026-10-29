@@ -23,10 +23,10 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: faHome, label: 'Dashboard', path: '/user' },
-  { icon: faChair, label: 'Book Seat', path: '/seats' },
+  { icon: faChair, label: 'Buy Ticket', path: '/seats' }, // ✅ Changed from Book Seat
   { icon: faTicket, label: 'My Tickets', path: '/user/tickets' },
   { icon: faCalendarCheck, label: 'My Bookings', path: '/user/bookings' },
-  { icon: faCommentDots, label: 'Support', path: '/user/queries' }, // ✅ FIXED
+  { icon: faCommentDots, label: 'Support', path: '/user/queries' }, 
   { icon: faUser, label: 'My Profile', path: '/user/profile' },
 ];
 
@@ -44,24 +44,23 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
 
   return (
     <aside
-      className={`bg-indigo-600 text-white h-full transition-all duration-300 flex flex-col ${
+      className={`text-white h-full transition-all duration-300 flex flex-col ${
         isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'
       }`}
+      style={{ backgroundColor: '#082845' }} // ✅ NLS Deep Navy
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-7 border-b border-indigo-500">
+      <div className="flex items-center gap-3 px-6 py-7 border-b border-white/10">
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
-          <FontAwesomeIcon icon={faBook} className="text-indigo-600 text-2xl" />
+          <FontAwesomeIcon icon={faBook} className="text-[#082845] text-2xl" />
         </div>
         {(isMobile || isOpen) && (
           <div className="leading-tight flex-1">
-            <p className="text-sm font-bold tracking-wider text-indigo-100">
+            <p className="text-sm font-bold tracking-wider text-gray-300">
               LIBRARY SERVICES
             </p>
-            <p className="text-xl font-extrabold text-white">LIBRARYSEAT</p>
+            <p className="text-xl font-extrabold text-white">e-ticketing</p>
           </div>
         )}
-        {/* Mobile close button */}
         {isMobile && (
           <button
             onClick={onClose}
@@ -73,7 +72,6 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
         )}
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 py-6 space-y-2 px-3 overflow-y-auto">
         {menuItems.map((item) => {
           const active = location.pathname === item.path;
@@ -83,9 +81,10 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
               to={item.path}
               className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${
                 active
-                  ? 'bg-indigo-500 text-white font-bold shadow-sm'
-                  : 'text-indigo-100 hover:bg-indigo-700 font-semibold'
+                  ? 'text-white font-bold shadow-sm'
+                  : 'text-gray-300 hover:bg-white/10 font-semibold hover:text-white'
               }`}
+              style={active ? { backgroundColor: '#186BB1' } : {}} // ✅ NLS Medium Blue
             >
               <FontAwesomeIcon
                 icon={item.icon}
@@ -97,11 +96,10 @@ const UserSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="p-3 border-t border-indigo-500">
+      <div className="p-3 border-t border-white/10">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-indigo-100 hover:bg-red-500 hover:text-white transition-all font-semibold"
+          className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-gray-300 hover:bg-red-500 hover:text-white transition-all font-semibold"
         >
           <FontAwesomeIcon
             icon={faRightFromBracket}

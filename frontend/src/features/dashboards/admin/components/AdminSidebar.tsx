@@ -12,8 +12,8 @@ import {
   faUser,
   faRightFromBracket,
   faTimes,
-  faCalendarTimes, // ✅ NEW
-  faTags,          // ✅ NEW
+  faCalendarTimes,
+  faTags,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -24,7 +24,6 @@ interface SidebarProps {
   isMobile?: boolean;
 }
 
-// ✅ UPDATED MENU ITEMS
 const menuItems = [
   { icon: faHome, label: 'Dashboard', path: '/admin' },
   { icon: faChair, label: 'Manage Seats', path: '/admin/seats' },
@@ -51,17 +50,18 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
 
   return (
     <aside
-      className={`bg-indigo-600 text-white h-full transition-all duration-300 flex flex-col ${
+      className={`text-white h-full transition-all duration-300 flex flex-col ${
         isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'
       }`}
+      style={{ backgroundColor: '#082845' }} // ✅ NLS Deep Navy
     >
-      <div className="flex items-center gap-3 px-6 py-7 border-b border-indigo-500">
+      <div className="flex items-center gap-3 px-6 py-7 border-b border-white/10">
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
-          <FontAwesomeIcon icon={faBook} className="text-indigo-600 text-2xl" />
+          <FontAwesomeIcon icon={faBook} className="text-[#082845] text-2xl" />
         </div>
         {(isMobile || isOpen) && (
           <div className="leading-tight flex-1">
-            <p className="text-sm font-bold tracking-wider text-indigo-100">
+            <p className="text-sm font-bold tracking-wider text-gray-300">
               ADMIN PANEL
             </p>
             <p className="text-xl font-extrabold text-white">e-ticketing</p>
@@ -83,9 +83,10 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
               to={item.path}
               className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${
                 active
-                  ? 'bg-indigo-500 text-white font-bold shadow-sm'
-                  : 'text-indigo-100 hover:bg-indigo-700 font-semibold'
+                  ? 'text-white font-bold shadow-sm'
+                  : 'text-gray-300 hover:bg-white/10 font-semibold hover:text-white'
               }`}
+              style={active ? { backgroundColor: '#186BB1' } : {}} // ✅ NLS Medium Blue for active
             >
               <FontAwesomeIcon icon={item.icon} className="text-xl w-6 shrink-0" />
               {(isMobile || isOpen) && <span className="text-lg">{item.label}</span>}
@@ -94,10 +95,10 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
         })}
       </nav>
 
-      <div className="p-3 border-t border-indigo-500">
+      <div className="p-3 border-t border-white/10">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-indigo-100 hover:bg-red-500 hover:text-white transition-all font-semibold"
+          className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-gray-300 hover:bg-red-500 hover:text-white transition-all font-semibold"
         >
           <FontAwesomeIcon icon={faRightFromBracket} className="text-xl w-6 shrink-0" />
           {(isMobile || isOpen) && <span className="text-lg font-bold">Logout</span>}

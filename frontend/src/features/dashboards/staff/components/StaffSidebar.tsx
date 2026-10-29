@@ -8,7 +8,7 @@ import {
   faRightFromBracket,
   faTimes,
   faComments,
-  faCalendarTimes, // ✅ Added
+  faCalendarTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -22,7 +22,7 @@ interface SidebarProps {
 const menuItems = [
   { icon: faCashRegister, label: 'Point of Sale', path: '/staff' },
   { icon: faCheckCircle, label: 'Check-In', path: '/staff/checkin' },
-  { icon: faCalendarTimes, label: 'Bookings', path: '/staff/bookings' }, // ✅ NEW
+  { icon: faCalendarTimes, label: 'Bookings', path: '/staff/bookings' },
   { icon: faComments, label: 'Queries', path: '/staff/queries' },
 ];
 
@@ -39,14 +39,17 @@ const StaffSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
   };
 
   return (
-    <aside className={`bg-indigo-600 text-white h-full transition-all duration-300 flex flex-col ${isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'}`}>
-      <div className="flex items-center gap-3 px-6 py-7 border-b border-indigo-500">
+    <aside 
+      className={`text-white h-full transition-all duration-300 flex flex-col ${isMobile ? 'w-72' : isOpen ? 'w-72' : 'w-20'}`}
+      style={{ backgroundColor: '#082845' }} // ✅ NLS Deep Navy
+    >
+      <div className="flex items-center gap-3 px-6 py-7 border-b border-white/10">
         <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0">
-          <FontAwesomeIcon icon={faBook} className="text-indigo-600 text-2xl" />
+          <FontAwesomeIcon icon={faBook} className="text-[#082845] text-2xl" />
         </div>
         {(isMobile || isOpen) && (
           <div className="leading-tight flex-1">
-            <p className="text-sm font-bold tracking-wider text-indigo-100">STAFF PANEL</p>
+            <p className="text-sm font-bold tracking-wider text-gray-300">STAFF PANEL</p>
             <p className="text-xl font-extrabold text-white">e-ticketing</p>
           </div>
         )}
@@ -61,7 +64,12 @@ const StaffSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
         {menuItems.map((item) => {
           const active = location.pathname === item.path;
           return (
-            <Link key={item.path} to={item.path} className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${active ? 'bg-indigo-500 text-white font-bold shadow-sm' : 'text-indigo-100 hover:bg-indigo-700 font-semibold'}`}>
+            <Link 
+              key={item.path} 
+              to={item.path} 
+              className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${active ? 'text-white font-bold shadow-sm' : 'text-gray-300 hover:bg-white/10 font-semibold hover:text-white'}`}
+              style={active ? { backgroundColor: '#186BB1' } : {}} // ✅ NLS Medium Blue
+            >
               <FontAwesomeIcon icon={item.icon} className="text-xl w-6 shrink-0" />
               {(isMobile || isOpen) && <span className="text-lg">{item.label}</span>}
             </Link>
@@ -69,8 +77,8 @@ const StaffSidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isMobile }) => 
         })}
       </nav>
 
-      <div className="p-3 border-t border-indigo-500">
-        <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-indigo-100 hover:bg-red-500 hover:text-white transition-all font-semibold">
+      <div className="p-3 border-t border-white/10">
+        <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-4 rounded-lg text-gray-300 hover:bg-red-500 hover:text-white transition-all font-semibold">
           <FontAwesomeIcon icon={faRightFromBracket} className="text-xl w-6 shrink-0" />
           {(isMobile || isOpen) && <span className="text-lg font-bold">Logout</span>}
         </button>
