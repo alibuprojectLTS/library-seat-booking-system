@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import StaffQueries from './features/dashboards/staff/pages/StaffQueries'; 
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
+import StaffBookings from './features/dashboards/staff/pages/StaffBookings'; 
+
 // Public
 import Home from './features/home/Home';
 import Login from './features/auth/Login';
@@ -65,7 +67,7 @@ const App: React.FC = () => (
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
-		<Route path="/about" element={<About />} />
+        <Route path="/about" element={<About />} />
 
         {/* ---------- User Dashboard ---------- */}
         <Route path="/user" element={<ProtectedRoute role="user"><UserLayout /></ProtectedRoute>}>
@@ -89,9 +91,9 @@ const App: React.FC = () => (
         <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="seats" element={<ManageSeats />} />
-          <Route path="bookings" element={<ManageBookings />} />    {/* ✅ NEW */}
-          <Route path="pricing" element={<ManagePricing />} />      {/* ✅ NEW */}
-          <Route path="users" element={<ManageUsers />} />          {/* ✅ NEW */}
+          <Route path="bookings" element={<ManageBookings />} />
+          <Route path="pricing" element={<ManagePricing />} />
+          <Route path="users" element={<ManageUsers />} />
           <Route path="csv-upload" element={<CSVUpload />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="status" element={<LibraryStatus />} />
@@ -101,7 +103,8 @@ const App: React.FC = () => (
         <Route path="/staff" element={<ProtectedRoute role="staff"><StaffLayout /></ProtectedRoute>}>
           <Route index element={<POS />} />
           <Route path="checkin" element={<CheckIn />} />
-		  <Route path="queries" element={<StaffQueries />} /> {/* ✅ Add this */}
+          <Route path="bookings" element={<StaffBookings />} /> {/* ✅ NEW ROUTE */}
+          <Route path="queries" element={<StaffQueries />} />
         </Route>
 
         {/* ---------- Finance Dashboard ---------- */}

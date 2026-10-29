@@ -6,7 +6,9 @@ import {
   faCashRegister,
   faCheckCircle,
   faRightFromBracket,
-  faTimes,faComments,
+  faTimes,
+  faComments,
+  faCalendarTimes, // ✅ Added
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -20,6 +22,7 @@ interface SidebarProps {
 const menuItems = [
   { icon: faCashRegister, label: 'Point of Sale', path: '/staff' },
   { icon: faCheckCircle, label: 'Check-In', path: '/staff/checkin' },
+  { icon: faCalendarTimes, label: 'Bookings', path: '/staff/bookings' }, // ✅ NEW
   { icon: faComments, label: 'Queries', path: '/staff/queries' },
 ];
 

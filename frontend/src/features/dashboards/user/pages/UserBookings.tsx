@@ -8,6 +8,8 @@ import {
   faMapMarkerAlt,
   faExclamationTriangle,
   faTimes,
+  faHistory,
+  faClock
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import apiClient from '../../../../api/core/apiClient';
@@ -35,6 +37,9 @@ const UserBookings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<number | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
+  
+  // ✅ Tab State
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
 
   const fetchBookings = () => {
     setLoading(true);
@@ -83,8 +88,25 @@ const UserBookings: React.FC = () => {
     return [...new Set(names)].join(', ') || '—';
   };
 
-  // ✅ Filter out cancelled bookings
-  const visibleBookings = bookings.filter((b) => b.booking_status !== 'cancelled');
+  // ✅ Date logic to separate Active vs History
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const validBookings = bookings.filter((b) => b.booking_status !== 'cancelled');
+
+  const activeBookings = validBookings.filter((b) => {
+    const bDate = new Date(b.booking_date);
+    bDate.setHours(0, 0, 0, 0);
+    return bDate >= today; // Today or future
+  });
+
+  const historyBookings = validBookings.filter((b) => {
+    const bDate = new Date(b.booking_date);
+    bDate.setHours(0, 0, 0, 0);
+    return bDate < today; // Past dates
+  });
+
+  const visibleBookings = activeTab === 'active' ? activeBookings : historyBookings;
 
   if (loading) {
     return (
@@ -100,16 +122,41 @@ const UserBookings: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">My Bookings</h1>
-          <span className="text-sm text-gray-500 font-medium">
-            {visibleBookings.length} total
-          </span>
+        </div>
+
+        {/* ✅ Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('active')}
+            className={`inline-flex items-center gap-2 h-9 px-4 rounded-md text-sm font-semibold transition ${
+              activeTab === 'active'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <FontAwesomeIcon icon={faClock} className="size-3" />
+            Active ({activeBookings.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`inline-flex items-center gap-2 h-9 px-4 rounded-md text-sm font-semibold transition ${
+              activeTab === 'history'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <FontAwesomeIcon icon={faHistory} className="size-3" />
+            History ({historyBookings.length})
+          </button>
         </div>
 
         {/* Empty */}
         {visibleBookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
             <FontAwesomeIcon icon={faCalendarCheck} className="text-5xl text-gray-300 mb-4" />
-            <p className="text-gray-500 text-base font-medium">You have no active bookings</p>
+            <p className="text-gray-500 text-base font-medium">
+              {activeTab === 'active' ? 'You have no active bookings.' : 'No past history found.'}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -171,8 +218,8 @@ const UserBookings: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Cancel */}
-                {(b.booking_status === 'paid' || b.booking_status === 'pending') && (
+                {/* Cancel Button - ONLY show on Active Tab */}
+                {activeTab === 'active' && (b.booking_status === 'paid' || b.booking_status === 'pending') && (
                   <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
                     <button
                       onClick={() => setConfirmId(b.booking_id)}
