@@ -1,28 +1,18 @@
 import { sequelize } from '../models/index.js';
-import { Booking, BookingItem, Seat, Ticket, User } from '../models/index.js';
+import { Booking, BookingItem, Seat, Ticket, User, LibrarySection } from '../models/index.js';
 import QRService from '../services/qrService.js';
 import { sendBookingConfirmation } from '../services/emailService.js';
 
-/**
- * POS — Process Cash Booking (Library Staff)
- */
 export const processPOSBooking = async (req, res) => {
   const transaction = await sequelize.transaction();
-
   try {
-    const { 
-      booking_date, 
-      seats, // array of seat IDs
-      occupant_name, 
-      occupant_email 
-    } = req.body;
+    const { booking_date, seats, occupant_name, occupant_email, add_electricity } = req.body;
 
     if (!booking_date || !seats || seats.length === 0) {
       await transaction.rollback();
       return res.status(400).json({ success: false, message: 'Date and seats required' });
     }
 
-    // 1. Check if user exists by email, or create a guest user
     let user = await User.findOne({ where: { email: occupant_email }, transaction });
     if (!user) {
       const tempPassword = Math.random().toString(36).slice(-8);
@@ -35,37 +25,38 @@ export const processPOSBooking = async (req, res) => {
       }, { transaction });
     }
 
-    // 2. Calculate total
-    const seatRecords = await Seat.findAll({ where: { seat_id: seats }, transaction });
-    const totalAmount = seatRecords.length * 200; 
+    const seatRecords = await Seat.findAll({
+      where: { seat_id: seats },
+      include: [{ model: LibrarySection }],
+      transaction
+    });
 
-    // 3. Create Booking (Status: PAID, Method: CASH)
+    let totalAmount = 0;
+    for (const seat of seatRecords) {
+      totalAmount += Number(seat.LibrarySection?.price_per_seat || 0);
+    }
+    if (add_electricity) totalAmount += 400;
+
     const booking = await Booking.create({
       user_id: user.user_id,
       booking_date,
       booking_status: 'paid',
       total_seats: seats.length,
       total_amount: totalAmount,
-      payment_method: 'cash'
+      payment_method: 'cash',
+      add_electricity: add_electricity || false
     }, { transaction });
 
-    // 4. Create Booking Items & Lock Seats
-    const bookingItems = [];
     for (const seatId of seats) {
-      const item = await BookingItem.create({
+      await BookingItem.create({
         booking_id: booking.booking_id,
         seat_id: seatId,
         occupant_name: occupant_name
       }, { transaction });
-      bookingItems.push(item);
 
-      await Seat.update(
-        { seat_status: 'booked' },
-        { where: { seat_id: seatId }, transaction }
-      );
+      await Seat.update({ seat_status: 'booked' }, { where: { seat_id: seatId }, transaction });
     }
 
-    // 5. Generate Ticket & QR using your QRService class
     const ticketCode = QRService.generateTicketCode(booking.booking_id);
     const qrData = await QRService.generateQRCode(ticketCode);
 
@@ -78,19 +69,12 @@ export const processPOSBooking = async (req, res) => {
 
     await transaction.commit();
 
-    // ✅ 6. Send Email (Async - confirmed)
     if (occupant_email) {
       sendBookingConfirmation(user, booking, ticket, seatRecords)
-        .then(() => console.log(`✅ POS Ticket email sent successfully to ${occupant_email}`))
-        .catch(err => console.error('❌ POS Email error:', err));
+        .catch(err => console.error('POS Email error:', err));
     }
 
-    res.json({
-      success: true,
-      message: 'POS Cash Ticket Generated Successfully',
-      ticket_code: ticketCode
-    });
-
+    res.json({ success: true, message: 'POS Cash Ticket Generated Successfully', ticket_code: ticketCode });
   } catch (error) {
     await transaction.rollback();
     console.error('POS Booking error:', error);
@@ -98,32 +82,30 @@ export const processPOSBooking = async (req, res) => {
   }
 };
 
-/**
- * Check-In — Mark ticket as used
- */
 export const checkInTicket = async (req, res) => {
   try {
     const { ticket_code } = req.body;
 
-    const ticket = await Ticket.findOne({ where: { ticket_code } });
+    const ticket = await Ticket.findOne({ 
+      where: { ticket_code },
+      include: [{ model: Booking }] 
+    });
+
     if (!ticket) {
       return res.status(404).json({ success: false, message: 'Ticket not found' });
+    }
+
+    if (ticket.Booking.booking_status === 'cancelled' || ticket.Booking.booking_status === 'refunded') {
+      return res.status(400).json({ success: false, message: 'INVALID TICKET: This booking was cancelled or refunded.' });
     }
 
     if (ticket.checked_in) {
       return res.status(400).json({ success: false, message: 'Ticket already checked in' });
     }
 
-    await ticket.update({
-      checked_in: true,
-      checked_in_at: new Date()
-    });
+    await ticket.update({ checked_in: true, checked_in_at: new Date() });
 
-    res.json({
-      success: true,
-      message: 'Checked in successfully',
-      ticket
-    });
+    res.json({ success: true, message: 'Checked in successfully', ticket });
   } catch (error) {
     console.error('Check-in error:', error);
     res.status(500).json({ success: false, message: 'Check-in failed' });

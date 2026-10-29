@@ -18,7 +18,7 @@ const Booking = sequelize.define('Booking', {
   booking_status: {
     type: DataTypes.STRING(20),
     defaultValue: 'pending',
-    validate: { isIn: [['pending', 'paid', 'cancelled', 'expired', 'refunded']] } // ✅ Added 'refunded'
+    validate: { isIn: [['pending', 'paid', 'cancelled', 'expired', 'refunded']] }
   },
   total_seats: {
     type: DataTypes.INTEGER,
@@ -32,11 +32,14 @@ const Booking = sequelize.define('Booking', {
     type: DataTypes.DATE,
     allowNull: true
   },
-  // ✅ Added to separate Online (PayChangu) vs Cash (POS)
   payment_method: {
     type: DataTypes.STRING(20),
     defaultValue: 'online',
     validate: { isIn: [['online', 'cash']] }
+  },
+  add_electricity: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   tableName: 'bookings',
