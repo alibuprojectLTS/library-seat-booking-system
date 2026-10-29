@@ -4,13 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDesktop,
   faBook,
-  faUsers,
   faChair,
   faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { getSections, type Section } from '../../../api/seats/seatApi';
 
-// Keys MUST match DB `section_name` exactly
 const SECTION_META: Record<
   string,
   { icon: any; bg: string; border: string; text: string }
@@ -26,12 +24,6 @@ const SECTION_META: Record<
     bg: 'bg-emerald-50',
     border: 'border-emerald-100',
     text: 'text-emerald-600',
-  },
-  'Discussion Rooms': {
-    icon: faUsers,
-    bg: 'bg-purple-50',
-    border: 'border-purple-100',
-    text: 'text-purple-600',
   },
 };
 
@@ -65,8 +57,8 @@ const LibrarySections: React.FC = () => {
               Loading sections...
             </p>
           </div>
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {[1, 2].map((i) => (
               <div
                 key={i}
                 className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md animate-pulse"
@@ -84,6 +76,9 @@ const LibrarySections: React.FC = () => {
     );
   }
 
+  // ✅ Filter out Discussion Rooms
+  const visibleSections = sections.filter(s => s.section_name !== 'Discussion Rooms');
+
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-16">
@@ -92,12 +87,12 @@ const LibrarySections: React.FC = () => {
             Library Sections
           </h2>
           <p className="mt-4 text-lg text-gray-600 font-medium">
-            Three sections to match the way you study best.
+            Two sections to match the way you study best.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {sections.map((s) => {
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {visibleSections.map((s) => {
             const meta = SECTION_META[s.section_name] || FALLBACK_META;
 
             return (

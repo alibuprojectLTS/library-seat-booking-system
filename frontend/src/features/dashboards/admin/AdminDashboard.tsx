@@ -9,10 +9,9 @@ import {
   faBullhorn,
   faArrowRight,
   faSpinner,
-  faWallet,
   faCalendarTimes,
   faTags,
-  faLandmark, // ✅ Added import
+  faLandmark,
 } from '@fortawesome/free-solid-svg-icons';
 import apiClient from '../../../api/core/apiClient';
 
@@ -25,7 +24,7 @@ interface Stats {
   todayBookings: number;
   pendingQueries: number;
   inactiveUsers: number;
-  totalRevenue: number;
+  totalRevenue?: number; // Optional now
 }
 
 const AdminDashboard: React.FC = () => {
@@ -40,6 +39,7 @@ const AdminDashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // ✅ Total Revenue card removed
   const metrics = [
     { title: 'Total Users', value: stats?.totalUsers || 0, icon: faUsers, bg: 'bg-blue-50', color: 'text-blue-600' },
     { title: 'Total Seats', value: stats?.totalSeats || 0, icon: faChair, bg: 'bg-purple-50', color: 'text-purple-600' },
@@ -48,7 +48,6 @@ const AdminDashboard: React.FC = () => {
     { title: 'Available Seats', value: stats?.availableSeats || 0, icon: faChair, bg: 'bg-green-50', color: 'text-green-600' },
     { title: 'Booked Seats', value: stats?.bookedSeats || 0, icon: faChair, bg: 'bg-red-50', color: 'text-red-600' },
     { title: 'Total Bookings', value: stats?.totalBookings || 0, icon: faCalendarCheck, bg: 'bg-indigo-50', color: 'text-indigo-600' },
-    { title: 'Total Revenue', value: `MK ${(stats?.totalRevenue || 0).toLocaleString()}`, icon: faWallet, bg: 'bg-emerald-50', color: 'text-emerald-700' },
     { title: 'Inactive Users', value: stats?.inactiveUsers || 0, icon: faUsers, bg: 'bg-gray-100', color: 'text-gray-600' },
   ];
 

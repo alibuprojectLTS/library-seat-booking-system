@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faChair, faCalendarAlt, faWallet, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faChair, faCalendarAlt, faWallet, faSpinner, faBolt } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import apiClient from '../../api/core/apiClient';
@@ -19,6 +19,8 @@ const BookingSummary: React.FC = () => {
   const [bookingDate, setBookingDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  
+  const [addElectricity, setAddElectricity] = useState(false);
 
   useEffect(() => {
     if (!state?.seatIds || !state?.sectionId) {
@@ -52,16 +54,16 @@ const BookingSummary: React.FC = () => {
     load();
   }, [state, navigate]);
 
-  const totalAmount = seats.length * (section?.price_per_seat || 0);
+  const basePrice = seats.length * (section?.price_per_seat || 0);
+  const totalAmount = basePrice + (addElectricity ? 400 : 0);
 
   const handleProceed = async () => {
     try {
       setSubmitting(true);
-
-      // ✅ Only sending date and seats. Backend handles the rest.
       const payload = {
         booking_date: bookingDate,
         seats: seats.map((s) => s.seat_id),
+        add_electricity: addElectricity
       };
 
       const { data } = await apiClient.post('/bookings', payload);
@@ -146,6 +148,26 @@ const BookingSummary: React.FC = () => {
                   </span>
                 ))}
               </div>
+            </div>
+
+            {/* ✅ Electricity Toggle */}
+            <div className="border-t border-gray-100 pt-6">
+              <label className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-lg cursor-pointer hover:bg-amber-100 transition">
+                <input 
+                  type="checkbox" 
+                  checked={addElectricity}
+                  onChange={(e) => setAddElectricity(e.target.checked)}
+                  className="w-5 h-5 accent-amber-500 cursor-pointer"
+                />
+                <div className="flex-1">
+                  <p className="font-bold text-gray-900 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faBolt} className="text-amber-500" />
+                    Add Electricity / Power Supply
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">Use of electricity in the library attracts an additional MWK 400.</p>
+                </div>
+                <span className="font-extrabold text-amber-700">+ MWK 400</span>
+              </label>
             </div>
           </div>
 

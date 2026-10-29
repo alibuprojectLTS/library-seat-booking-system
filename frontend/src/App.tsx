@@ -2,10 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import StaffQueries from './features/dashboards/staff/pages/StaffQueries'; 
-
 import AuthProvider from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
-
 // Public
 import Home from './features/home/Home';
 import Login from './features/auth/Login';
@@ -39,9 +37,9 @@ import ManageSeats from './features/dashboards/admin/pages/ManageSeats';
 import CSVUpload from './features/dashboards/admin/pages/CSVUpload';
 import Announcements from './features/dashboards/admin/pages/Announcements';
 import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
-import ManageBookings from './features/dashboards/admin/pages/ManageBookings'; // ✅ NEW
-import ManageUsers from './features/dashboards/admin/pages/ManageUsers';       // ✅ NEW
-import ManagePricing from './features/dashboards/admin/pages/ManagePricing';   // ✅ NEW
+import ManageBookings from './features/dashboards/admin/pages/ManageBookings'; 
+import ManageUsers from './features/dashboards/admin/pages/ManageUsers';       
+import ManagePricing from './features/dashboards/admin/pages/ManagePricing';   
 
 // Staff Dashboard
 import StaffLayout from './features/dashboards/staff/StaffLayout';
