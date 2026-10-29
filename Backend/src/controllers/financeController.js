@@ -19,7 +19,7 @@ export const getFinancialReport = async (req, res) => {
     
     startDate.setHours(0, 0, 0, 0);
 
-    // 1. Get the summarized stats
+    // 1. Get the summarized stats (ONLY PAID)
     const revenue = await Booking.sum('total_amount', {
       where: { booking_status: 'paid', created_at: { [Op.gte]: startDate } }
     });
@@ -36,11 +36,11 @@ export const getFinancialReport = async (req, res) => {
       where: { booking_status: 'paid', payment_method: 'cash', created_at: { [Op.gte]: startDate } }
     });
 
-    // 2. Get the detailed list of who paid
-    // We use raw: false so Sequelize maps the associations properly
+    // 2. Get the detailed list of who paid, cancelled, or refunded
+    // ✅ ADDED 'cancelled' to the status array
     const paymentsList = await Booking.findAll({
       where: { 
-        booking_status: ['paid', 'refunded'], 
+        booking_status: ['paid', 'refunded', 'cancelled'], 
         created_at: { [Op.gte]: startDate } 
       },
       include: [{ model: User, attributes: ['first_name', 'last_name', 'email'] }],
@@ -78,6 +78,8 @@ export const processRefund = async (req, res) => {
 
     await booking.update({ booking_status: 'refunded' });
 
+    // Note: In a real production app, you would trigger an email here using your sendEmail service.
+    
     res.json({ success: true, message: 'Refund processed successfully' });
   } catch (error) {
     console.error('Refund error:', error);
