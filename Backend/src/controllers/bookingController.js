@@ -18,7 +18,6 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Maximum 5 seats per booking' });
     }
 
-    // Fetch seats with their sections to get real price
     const seatRecords = await Seat.findAll({
       where: { seat_id: seats },
       include: [{ model: LibrarySection }],
@@ -34,7 +33,6 @@ export const createBooking = async (req, res) => {
       totalAmount += Number(seat.LibrarySection?.price_per_seat || 0);
     }
 
-    // Add Electricity Fee
     if (add_electricity) {
       totalAmount += 400;
     }
@@ -153,8 +151,8 @@ export const cancelBooking = async (req, res) => {
       await Seat.update({ seat_status: 'available' }, { where: { seat_id: item.seat_id }, transaction });
     }
 
-    // Invalidate the ticket immediately
-    await Ticket.update({ is_valid: false }, { where: { booking_id: booking.booking_id }, transaction });
+    // ✅ Permanently delete the ticket immediately
+    await Ticket.destroy({ where: { booking_id: booking.booking_id }, transaction });
 
     await booking.update({ booking_status: 'cancelled' }, { transaction });
     await transaction.commit();
@@ -167,10 +165,8 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-// ✅ NEW: Delete Booking History (Permanently)
 export const deleteBookingHistory = async (req, res) => {
   const transaction = await sequelize.transaction();
-  
   try {
     const { id } = req.params;
     const userId = req.user.userId;
@@ -194,15 +190,8 @@ export const deleteBookingHistory = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cannot delete active bookings. Cancel it instead.' });
     }
 
-    // ✅ 1. Delete the associated Booking Items first (to prevent foreign key errors)
-    await BookingItem.destroy({ 
-      where: { booking_id: booking.booking_id },
-      transaction 
-    });
-
-    // ✅ 2. Permanently delete the Booking from DB
+    await BookingItem.destroy({ where: { booking_id: booking.booking_id }, transaction });
     await booking.destroy({ transaction });
-
     await transaction.commit();
 
     res.json({ success: true, message: 'Booking permanently deleted from history' });

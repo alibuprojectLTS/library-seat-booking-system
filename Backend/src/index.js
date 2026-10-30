@@ -9,6 +9,7 @@ import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database.js';
 import routes from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { startCleanupJobs } from './jobs/cleanupJobs.js'; // ✅ Added Cron Job Import
 
 const require = createRequire(import.meta.url);
 const swaggerDocument = require('./swagger-output.json');
@@ -79,6 +80,9 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
+
+    // ✅ Start the daily cleanup job for expired tickets
+    startCleanupJobs();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
