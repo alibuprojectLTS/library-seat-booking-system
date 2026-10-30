@@ -41,7 +41,8 @@ import Announcements from './features/dashboards/admin/pages/Announcements';
 import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
 import ManageBookings from './features/dashboards/admin/pages/ManageBookings'; 
 import ManageUsers from './features/dashboards/admin/pages/ManageUsers';       
-import ManagePricing from './features/dashboards/admin/pages/ManagePricing';   
+import ManagePricing from './features/dashboards/admin/pages/ManagePricing'; 
+import AdminProfile from './features/dashboards/admin/pages/AdminProfile';  
 
 // Staff Dashboard
 import StaffLayout from './features/dashboards/staff/StaffLayout';
@@ -97,6 +98,7 @@ const App: React.FC = () => (
           <Route path="csv-upload" element={<CSVUpload />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="status" element={<LibraryStatus />} />
+		  <Route path="profile" element={<AdminProfile />} />
         </Route>
 
         {/* ---------- Staff Dashboard ---------- */}

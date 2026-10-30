@@ -64,16 +64,29 @@ const UserDashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ Only PAID bookings
-  const paidBookings = bookings.filter((b) => b.booking_status === 'paid');
+  // ✅ DATE LOGIC
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const totalSpent = paidBookings.reduce(
-    (sum, b) => sum + Number(b.total_amount || 0),
-    0
-  );
+  const paidBookings = bookings.filter((b) => b.booking_status === 'paid' || b.booking_status === 'pending');
 
-  const activeBookings = paidBookings;
-  const validTickets = tickets.filter((t) => t.is_valid);
+  const totalSpent = bookings
+    .filter((b) => b.booking_status === 'paid')
+    .reduce((sum, b) => sum + Number(b.total_amount || 0), 0);
+
+  const activeBookings = paidBookings.filter((b) => {
+    const bDate = new Date(b.booking_date);
+    bDate.setHours(0, 0, 0, 0);
+    return bDate >= today;
+  });
+
+  // ✅ Only count valid tickets for today or the future
+  const validTickets = tickets.filter((t) => {
+    if (!t.is_valid) return false;
+    const tDate = new Date(t.valid_date);
+    tDate.setHours(0, 0, 0, 0);
+    return tDate >= today;
+  });
 
   // ✅ Trend — only paid bookings
   const bookingTrend = (() => {
@@ -82,7 +95,7 @@ const UserDashboard: React.FC = () => {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      const count = paidBookings.filter((b) => b.booking_date === dateStr).length;
+      const count = bookings.filter((b) => b.booking_status === 'paid' && b.booking_date === dateStr).length;
       days.push({ date: dateStr, count });
     }
     return days;
@@ -96,15 +109,15 @@ const UserDashboard: React.FC = () => {
 
   const PIE_COLORS = ['#10B981', '#F59E0B', '#EF4444'];
 
+  // ✅ REMOVED "Total Bookings" to fix the phantom numbers
   const metrics = [
-    { title: 'Total Bookings', value: activeBookings.length, icon: faCalendarCheck, bg: 'bg-blue-50', color: 'text-blue-600' },
     { title: 'Active Bookings', value: activeBookings.length, icon: faClock, bg: 'bg-emerald-50', color: 'text-emerald-600' },
-    { title: 'My Tickets', value: validTickets.length, icon: faTicket, bg: 'bg-purple-50', color: 'text-purple-600' },
     { title: 'Total Spent', value: `MK ${totalSpent}`, icon: faWallet, bg: 'bg-amber-50', color: 'text-amber-600' },
+    { title: 'My Tickets', value: validTickets.length, icon: faTicket, bg: 'bg-purple-50', color: 'text-purple-600' },
   ];
 
   const quickActions = [
-    { label: 'Book a Seat', path: '/seats', icon: faChair, color: 'bg-blue-600' },
+    { label: 'Buy Ticket', path: '/seats', icon: faChair, color: 'bg-blue-600' },
     { label: 'My Tickets', path: '/user/tickets', icon: faTicket, color: 'bg-purple-600' },
     { label: 'My Bookings', path: '/user/bookings', icon: faCalendarCheck, color: 'bg-emerald-600' },
     { label: 'Submit Query', path: '/user/queries', icon: faCommentDots, color: 'bg-pink-600' },
@@ -137,8 +150,8 @@ const UserDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Metrics (Now 3 cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {metrics.map((m) => (
           <div key={m.title} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
             <div className="flex items-center justify-between">
