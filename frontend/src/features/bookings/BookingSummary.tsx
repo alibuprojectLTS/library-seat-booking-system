@@ -12,19 +12,21 @@ interface Section { section_id: number; section_name: string; price_per_seat: nu
 const BookingSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { seatIds: number[]; sectionId: number } | null;
+  
+  // ✅ 1. Read bookingDate from the previous step
+  const state = location.state as { seatIds: number[]; sectionId: number; bookingDate: string } | null;
 
   const [seats, setSeats] = useState<Seat[]>([]);
   const [section, setSection] = useState<Section | null>(null);
-  const [bookingDate, setBookingDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
   const [addElectricity, setAddElectricity] = useState(false);
 
   useEffect(() => {
-    if (!state?.seatIds || !state?.sectionId) {
-      toast.error('No seats selected. Redirecting...');
+    // If no date was passed, send them back to pick a date
+    if (!state?.seatIds || !state?.sectionId || !state?.bookingDate) {
+      toast.error('Missing booking details. Redirecting...');
       navigate('/seats');
       return;
     }
@@ -61,7 +63,7 @@ const BookingSummary: React.FC = () => {
     try {
       setSubmitting(true);
       const payload = {
-        booking_date: bookingDate,
+        booking_date: state?.bookingDate, // ✅ Use the passed date
         seats: seats.map((s) => s.seat_id),
         add_electricity: addElectricity
       };
@@ -106,7 +108,7 @@ const BookingSummary: React.FC = () => {
             </button>
 
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">Booking Summary</h1>
-            <p className="text-gray-700 text-lg font-semibold mt-2">Review your seats and select a date.</p>
+            <p className="text-gray-700 text-lg font-semibold mt-2">Review your seats and add any extras.</p>
           </div>
 
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 space-y-6">
@@ -122,19 +124,18 @@ const BookingSummary: React.FC = () => {
                 </div>
               </div>
 
+              {/* ✅ 2. Static Date Display (instead of input) */}
               <div className="flex items-start gap-4">
                 <div className="p-3 rounded-lg bg-emerald-50">
                   <FontAwesomeIcon icon={faCalendarAlt} className="text-emerald-600 text-xl" />
                 </div>
-                <div className="flex-1">
+                <div>
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Booking Date</p>
-                  <input
-                    type="date"
-                    value={bookingDate}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => setBookingDate(e.target.value)}
-                    className="mt-2 w-full rounded-md border border-gray-300 py-2.5 px-3 text-base font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-600 transition"
-                  />
+                  <p className="text-lg font-extrabold text-gray-900 mt-1">
+                    {new Date(state?.bookingDate || '').toLocaleDateString('en-US', {
+                      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                    })}
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faArrowLeft, faSpinner, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import AnimatedBackground from '../../components/AnimatedBackground';
 import SectionTabs from './components/SectionTabs';
@@ -11,6 +11,10 @@ import { useSeats } from './hooks/useSeats';
 
 const SeatMap: React.FC = () => {
   const navigate = useNavigate();
+  
+  // ✅ 1. New State for the Date
+  const [bookingDate, setBookingDate] = useState<string>('');
+
   const {
     sections,
     activeSection,
@@ -25,15 +29,23 @@ const SeatMap: React.FC = () => {
   } = useSeats();
 
   const handleContinue = () => {
+    if (!bookingDate) {
+      toast.error('Please select a date first');
+      return;
+    }
     if (selected.length === 0) {
       toast.error('Please select at least one seat');
       return;
     }
+    
     toast.success(`${selected.length} seat(s) selected`);
+    
+    // ✅ Pass the date to the next page
     navigate('/bookings/summary', {
       state: {
         seatIds: selected,
         sectionId: activeSection,
+        bookingDate: bookingDate,
       },
     });
   };
@@ -52,9 +64,9 @@ const SeatMap: React.FC = () => {
     <AnimatedBackground>
       <div className="p-4 md:p-6 pb-16">
         <div className="max-w-6xl mx-auto space-y-6">
+          
           {/* Header */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
-            {/* Back to Dashboard */}
             <button
               onClick={() => navigate('/user')}
               className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-bold text-base transition mb-4"
@@ -63,69 +75,97 @@ const SeatMap: React.FC = () => {
             </button>
 
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-              Select Your Seat
+              Buy a Ticket
             </h1>
             <p className="text-gray-700 text-lg font-semibold mt-2">
-              Choose up to 5 seats from your preferred section.
+              Select a date first, then choose your seats.
             </p>
           </div>
 
-          {/* Section Tabs */}
+          {/* ✅ STEP 1: Date Selection */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
-            <SectionTabs
-              sections={sections}
-              activeSection={activeSection}
-              onChange={(id) => {
-                if (selected.length > 0) {
-                  toast('Section changed — selection cleared', { icon: '🔄' });
-                }
-                clearSelection();
-                setActiveSection(id);
-              }}
-            />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-emerald-50">
+                  <FontAwesomeIcon icon={faCalendarAlt} className="text-emerald-600 text-2xl" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-gray-900">Step 1: Booking Date</h2>
+                  <p className="text-sm text-gray-500 font-medium">When would you like to visit the library?</p>
+                </div>
+              </div>
+              
+              <input
+                type="date"
+                value={bookingDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setBookingDate(e.target.value)}
+                className="w-full md:w-64 rounded-md border border-gray-300 py-3 px-4 text-base font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-600 outline-none transition"
+                required
+              />
+            </div>
           </div>
 
-          {/* Seat Map */}
-          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
-            {activeSectionData && (
-              <div className="text-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-                  {activeSectionData.section_name}
-                </h2>
-                <p className="text-base md:text-lg text-gray-700 font-semibold mt-2">
-                  {activeSectionData.description}
-                </p>
-              </div>
-            )}
+          {/* ✅ STEP 2: Seat Selection (Only enabled if date is picked) */}
+          <div className={`transition-opacity duration-300 ${!bookingDate ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            
+            {/* Section Tabs */}
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 mb-6">
+              <SectionTabs
+                sections={sections}
+                activeSection={activeSection}
+                onChange={(id) => {
+                  if (selected.length > 0) {
+                    toast('Section changed — selection cleared', { icon: '🔄' });
+                  }
+                  clearSelection();
+                  setActiveSection(id);
+                }}
+              />
+            </div>
 
-            {loadingSeats ? (
-              <div className="flex items-center justify-center py-12">
-                <FontAwesomeIcon
-                  icon={faSpinner}
-                  className="animate-spin text-4xl text-indigo-600"
-                />
-              </div>
-            ) : seats.length === 0 ? (
-              <p className="text-center text-gray-600 py-12 text-lg font-bold">
-                No seats available in this section yet.
-              </p>
-            ) : (
-              <>
-                <SeatLegend />
-
-                <div className="flex flex-wrap gap-3 justify-center mt-6">
-                  {seats.map((seat) => (
-                    <Seat
-                      key={seat.seat_id}
-                      label={seat.seat_label}
-                      status={seat.seat_status}
-                      isSelected={selected.includes(seat.seat_id)}
-                      onClick={() => toggleSeat(seat.seat_id)}
-                    />
-                  ))}
+            {/* Seat Map */}
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
+              {activeSectionData && (
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+                    {activeSectionData.section_name}
+                  </h2>
+                  <p className="text-base md:text-lg text-gray-700 font-semibold mt-2">
+                    {activeSectionData.description}
+                  </p>
                 </div>
-              </>
-            )}
+              )}
+
+              {loadingSeats ? (
+                <div className="flex items-center justify-center py-12">
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    className="animate-spin text-4xl text-indigo-600"
+                  />
+                </div>
+              ) : seats.length === 0 ? (
+                <p className="text-center text-gray-600 py-12 text-lg font-bold">
+                  No seats available in this section yet.
+                </p>
+              ) : (
+                <>
+                  <SeatLegend />
+
+                  <div className="flex flex-wrap gap-3 justify-center mt-6">
+                    {seats.map((seat) => (
+                      <Seat
+                        key={seat.seat_id}
+                        label={seat.seat_label}
+                        status={seat.seat_status}
+                        isSelected={selected.includes(seat.seat_id)}
+                        onClick={() => toggleSeat(seat.seat_id)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Selection Summary */}
@@ -147,9 +187,9 @@ const SeatMap: React.FC = () => {
 
             <button
               onClick={handleContinue}
-              disabled={selected.length === 0}
+              disabled={selected.length === 0 || !bookingDate}
               className={`inline-flex items-center gap-3 px-8 py-4 rounded-lg font-extrabold text-lg transition ${
-                selected.length === 0
+                selected.length === 0 || !bookingDate
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg'
               }`}
