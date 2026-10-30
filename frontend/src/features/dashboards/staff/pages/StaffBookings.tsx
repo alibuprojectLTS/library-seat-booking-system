@@ -25,8 +25,8 @@ const StaffBookings: React.FC = () => {
 
   const fetchBookings = async () => {
     try {
-      // ✅ Staff uses the search endpoint (returns all)
-      const { data } = await apiClient.get('/admin/bookings/search');
+      // ✅ Changed to /staff/bookings
+      const { data } = await apiClient.get('/staff/bookings');
       setBookings(data.bookings || []);
     } catch {
       toast.error('Failed to load bookings');
