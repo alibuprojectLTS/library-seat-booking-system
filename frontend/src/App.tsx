@@ -42,7 +42,8 @@ import LibraryStatus from './features/dashboards/admin/pages/LibraryStatus';
 import ManageBookings from './features/dashboards/admin/pages/ManageBookings'; 
 import ManageUsers from './features/dashboards/admin/pages/ManageUsers';       
 import ManagePricing from './features/dashboards/admin/pages/ManagePricing'; 
-import AdminProfile from './features/dashboards/admin/pages/AdminProfile';  
+import AdminProfile from './features/dashboards/admin/pages/AdminProfile'; 
+import AuditTrail from './features/dashboards/admin/pages/AuditTrail'; 
 
 // Staff Dashboard
 import StaffLayout from './features/dashboards/staff/StaffLayout';
@@ -99,6 +100,7 @@ const App: React.FC = () => (
           <Route path="announcements" element={<Announcements />} />
           <Route path="status" element={<LibraryStatus />} />
 		  <Route path="profile" element={<AdminProfile />} />
+		  <Route path="audit" element={<AuditTrail />} />
         </Route>
 
         {/* ---------- Staff Dashboard ---------- */}

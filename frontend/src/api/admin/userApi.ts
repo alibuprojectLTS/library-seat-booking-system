@@ -7,6 +7,7 @@ export interface User {
   email: string;
   role: string;
   last_login: string | null;
+  is_active: boolean; // ✅ Added this line
 }
 
 export const getAllUsers = async (): Promise<User[]> => {

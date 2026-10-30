@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, faSearch, faUserSlash, faExclamationTriangle, 
-  faTimes, faFilter, faChevronDown 
+  faTimes, faFilter, faChevronDown, faUserCheck, faUserTimes
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { getAllUsers, type User } from '../../../../api/admin/userApi';
@@ -12,15 +12,20 @@ const ManageUsers: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // ✅ Search, Filter & Pagination State
+  // ✅ Search & Filter State
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  
+  // ✅ Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
   // ✅ Modal State
   const [showInactiveModal, setShowInactiveModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  
+  // ✅ Toggle Status State
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -49,6 +54,19 @@ const ManageUsers: React.FC = () => {
     }
   };
 
+  const handleToggleStatus = async (id: number) => {
+    setTogglingId(id);
+    try {
+      const { data } = await apiClient.put(`/admin/users/${id}/toggle`);
+      toast.success(data.message);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update user status');
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   // ✅ Filter Logic
   const filteredUsers = users.filter(u => {
     const searchStr = search.toLowerCase();
@@ -58,7 +76,6 @@ const ManageUsers: React.FC = () => {
       u.email.toLowerCase().includes(searchStr);
 
     if (!matchesSearch) return false;
-
     if (roleFilter !== 'all' && u.role !== roleFilter) return false;
 
     return true;
@@ -97,6 +114,7 @@ const ManageUsers: React.FC = () => {
           />
         </div>
         
+        {/* Role Filter */}
         <div className="relative min-w-[200px]">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FontAwesomeIcon icon={faFilter} className="text-gray-400" />
@@ -133,6 +151,7 @@ const ManageUsers: React.FC = () => {
                   <th className="text-left text-xs font-bold text-gray-500 uppercase px-4 py-3">Role</th>
                   <th className="text-left text-xs font-bold text-gray-500 uppercase px-4 py-3">Status</th>
                   <th className="text-left text-xs font-bold text-gray-500 uppercase px-4 py-3">Last Login</th>
+                  <th className="text-right text-xs font-bold text-gray-500 uppercase px-4 py-3">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -149,9 +168,34 @@ const ManageUsers: React.FC = () => {
                       }`}>{u.role}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-700">Active</span>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
+                        u.is_active !== false 
+                          ? 'bg-emerald-100 text-emerald-700' 
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {u.is_active !== false ? 'Active' : 'Inactive'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never'}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button 
+                        onClick={() => handleToggleStatus(u.user_id)}
+                        disabled={togglingId === u.user_id}
+                        className={`inline-flex items-center gap-2 h-8 px-3 rounded-md text-xs font-bold transition disabled:opacity-50 ${
+                          u.is_active !== false 
+                            ? 'bg-red-50 text-red-600 hover:bg-red-100' 
+                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                        }`}
+                      >
+                        {togglingId === u.user_id ? (
+                          <FontAwesomeIcon icon={faSpinner} spin />
+                        ) : u.is_active !== false ? (
+                          <><FontAwesomeIcon icon={faUserTimes} /> Deactivate</>
+                        ) : (
+                          <><FontAwesomeIcon icon={faUserCheck} /> Activate</>
+                        )}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -24,7 +24,6 @@ interface Stats {
   todayBookings: number;
   pendingQueries: number;
   inactiveUsers: number;
-  totalRevenue?: number; // Optional now
 }
 
 const AdminDashboard: React.FC = () => {
@@ -39,7 +38,6 @@ const AdminDashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ Total Revenue card removed
   const metrics = [
     { title: 'Total Users', value: stats?.totalUsers || 0, icon: faUsers, bg: 'bg-blue-50', color: 'text-blue-600' },
     { title: 'Total Seats', value: stats?.totalSeats || 0, icon: faChair, bg: 'bg-purple-50', color: 'text-purple-600' },
@@ -51,14 +49,15 @@ const AdminDashboard: React.FC = () => {
     { title: 'Inactive Users', value: stats?.inactiveUsers || 0, icon: faUsers, bg: 'bg-gray-100', color: 'text-gray-600' },
   ];
 
+  // ✅ All Quick Actions now use the SAME consistent color (indigo-600 maps to NLS Blue)
   const quickActions = [
     { label: 'Manage Seats', path: '/admin/seats', icon: faChair, color: 'bg-indigo-600' },
-    { label: 'Manage Bookings', path: '/admin/bookings', icon: faCalendarTimes, color: 'bg-rose-600' },
-    { label: 'Price Management', path: '/admin/pricing', icon: faTags, color: 'bg-teal-600' },
-    { label: 'Manage Users', path: '/admin/users', icon: faUsers, color: 'bg-blue-600' },
-    { label: 'Post Announcement', path: '/admin/announcements', icon: faBullhorn, color: 'bg-pink-600' },
-    { label: 'Library Status', path: '/admin/status', icon: faLandmark, color: 'bg-emerald-600' },
-    { label: 'CSV Upload', path: '/admin/csv-upload', icon: faChair, color: 'bg-purple-600' },
+    { label: 'Manage Bookings', path: '/admin/bookings', icon: faCalendarTimes, color: 'bg-indigo-600' },
+    { label: 'Price Management', path: '/admin/pricing', icon: faTags, color: 'bg-indigo-600' },
+    { label: 'Manage Users', path: '/admin/users', icon: faUsers, color: 'bg-indigo-600' },
+    { label: 'Post Announcement', path: '/admin/announcements', icon: faBullhorn, color: 'bg-indigo-600' },
+    { label: 'Library Status', path: '/admin/status', icon: faLandmark, color: 'bg-indigo-600' },
+    { label: 'CSV Upload', path: '/admin/csv-upload', icon: faChair, color: 'bg-indigo-600' },
   ];
 
   if (loading) {

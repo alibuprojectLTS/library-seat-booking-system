@@ -13,7 +13,7 @@ import {
   faRightFromBracket,
   faTimes,
   faCalendarTimes,
-  faTags,
+  faTags,faHistory,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../../auth/AuthContext';
 import { TOKEN_KEY, USER_KEY } from '../../../../config/constants';
@@ -33,6 +33,7 @@ const menuItems = [
   { icon: faBullhorn, label: 'Announcements', path: '/admin/announcements' },
   { icon: faLandmark, label: 'Library Status', path: '/admin/status' },
   { icon: faFileCsv, label: 'CSV Upload', path: '/admin/csv-upload' },
+   { icon: faHistory, label: 'Audit Trail', path: '/admin/audit' }, 
   { icon: faUser, label: 'Profile', path: '/admin/profile' },
 ];
 
