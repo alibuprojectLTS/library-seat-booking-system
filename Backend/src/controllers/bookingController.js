@@ -18,7 +18,7 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Maximum 5 seats per booking' });
     }
 
-    // ✅ Fetch seats with their sections to get real price
+    // Fetch seats with their sections to get real price
     const seatRecords = await Seat.findAll({
       where: { seat_id: seats },
       include: [{ model: LibrarySection }],
@@ -34,7 +34,7 @@ export const createBooking = async (req, res) => {
       totalAmount += Number(seat.LibrarySection?.price_per_seat || 0);
     }
 
-    // ✅ Add Electricity Fee
+    // Add Electricity Fee
     if (add_electricity) {
       totalAmount += 400;
     }
@@ -153,7 +153,7 @@ export const cancelBooking = async (req, res) => {
       await Seat.update({ seat_status: 'available' }, { where: { seat_id: item.seat_id }, transaction });
     }
 
-    // ✅ Invalidate the ticket immediately
+    // Invalidate the ticket immediately
     await Ticket.update({ is_valid: false }, { where: { booking_id: booking.booking_id }, transaction });
 
     await booking.update({ booking_status: 'cancelled' }, { transaction });
@@ -164,5 +164,51 @@ export const cancelBooking = async (req, res) => {
     await transaction.rollback();
     console.error('Cancel booking error:', error);
     res.status(500).json({ success: false, message: error.message || 'Failed to cancel booking' });
+  }
+};
+
+// ✅ NEW: Delete Booking History (Permanently)
+export const deleteBookingHistory = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const booking = await Booking.findOne({
+      where: { booking_id: id, user_id: userId }
+    });
+
+    if (!booking) {
+      await transaction.rollback();
+      return res.status(404).json({ success: false, message: 'Booking not found' });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookingDate = new Date(booking.booking_date);
+    bookingDate.setHours(0, 0, 0, 0);
+
+    if (bookingDate >= today) {
+      await transaction.rollback();
+      return res.status(400).json({ success: false, message: 'Cannot delete active bookings. Cancel it instead.' });
+    }
+
+    // ✅ 1. Delete the associated Booking Items first (to prevent foreign key errors)
+    await BookingItem.destroy({ 
+      where: { booking_id: booking.booking_id },
+      transaction 
+    });
+
+    // ✅ 2. Permanently delete the Booking from DB
+    await booking.destroy({ transaction });
+
+    await transaction.commit();
+
+    res.json({ success: true, message: 'Booking permanently deleted from history' });
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Delete history error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete booking' });
   }
 };
