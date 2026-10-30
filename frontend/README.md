@@ -1,159 +1,146 @@
 Blantyre Regional Branch Library e-ticketing system - Frontend
 A modern React + TypeScript frontend for the NLS e-ticketing system, built with Vite, Tailwind CSS, and React Router.
 
-🚀 Tech Stack
+Tech Stack
 Technology	Purpose
 React	UI Library
 TypeScript	Type Safety
 Vite	Build Tool
 React Router	Routing
-Tailwind CSS	Styling
+Tailwind CSS	Styling (NLS Theme + Ubuntu Font)
 Axios	API Calls
 Font Awesome	Icons
 Lucide React	Home page icons
 Recharts	Charts
 React Hot Toast	Notifications
 HTML5-QRCode	Camera QR Scanning
+jsPDF	PDF Exports
 
 ## 📁 Project Structure
 frontend/
 ├── src/
 │   ├── api/                                    # API calls
 │   │   ├── admin/
-│   │   │   ├── announcementApi.ts              # Admin announcements CRUD
-│   │   │   ├── dashboardApi.ts                 # Admin stats
-│   │   │   ├── pricingApi.ts                   # Price Management (New)
-│   │   │   ├── seatApi.ts                      # Admin seat CRUD
-│   │   │   ├── statusApi.ts                    # Library status update
-│   │   │   └── userApi.ts                      # Manage users (New)
+│   │   │   ├── announcementApi.ts              
+│   │   │   ├── dashboardApi.ts                 
+│   │   │   ├── pricingApi.ts                   
+│   │   │   ├── seatApi.ts                      
+│   │   │   ├── statusApi.ts                    
+│   │   │   └── userApi.ts                      
 │   │   ├── announcements/
-│   │   │   └── announcementApi.ts              # Public announcements
 │   │   ├── auth/
-│   │   │   └── authApi.ts                      # Login, register, me
 │   │   ├── bookings/
-│   │   │   └── bookingApi.ts                   # Booking create/get/cancel
 │   │   ├── core/
-│   │   │   └── apiClient.ts                    # Axios instance + JWT
 │   │   ├── payments/
-│   │   │   └── paymentApi.ts                   # Payment initiate/verify
 │   │   ├── queries/
-│   │   │   └── queryApi.ts                     # User queries
 │   │   ├── seats/
-│   │   │   └── seatApi.ts                      # Sections + seats
 │   │   ├── status/
-│   │   │   └── statusApi.ts                    # Library status
 │   │   └── tickets/
-│   │       └── ticketApi.ts                    # User tickets
 │   │
 │   ├── assets/
-│   │   └── images/                             # Static images
+│   │   └── images/                             
 │   │
 │   ├── auth/                                   # Auth logic
-│   │   ├── AuthContext.tsx                     # User type + context
-│   │   ├── AuthProvider.tsx                    # Bootstrap + provide
-│   │   └── ProtectedRoute.tsx                  # Route guard by role
+│   │   ├── AuthContext.tsx                     
+│   │   ├── AuthProvider.tsx                    
+│   │   └── ProtectedRoute.tsx                  
 │   │
 │   ├── components/                             # Reusable UI
 │   │   ├── Alert.tsx
-│   │   ├── AnimatedBackground.tsx              # Login-style bg
+│   │   ├── AnimatedBackground.tsx              
 │   │   ├── Button.tsx
 │   │   ├── Card.tsx
 │   │   ├── Input.tsx
 │   │   ├── Loader.tsx
 │   │   ├── Modal.tsx
-│   │   └── Navbar.tsx                          # Home Navbar + Top Status Banner
+│   │   └── Navbar.tsx                          
 │   │
 │   ├── config/
-│   │   └── constants.ts                        # API URL, keys, roles
+│   │   └── constants.ts                        
 │   │
 │   ├── features/                               # Feature modules
+│   │   ├── about/
+│   │   │   └── About.tsx                       # ✅ NLS About Story
 │   │   ├── auth/
-│   │   │   ├── Login.tsx                       # Redirects by role
+│   │   │   ├── Login.tsx                       # ✅ Redirects by role
 │   │   │   └── Register.tsx
 │   │   ├── dashboards/
 │   │   │   ├── admin/
-│   │   │   │   ├── AdminDashboard.tsx          # 9 live stats
+│   │   │   │   ├── AdminDashboard.tsx          # ✅ 8 live stats (No Revenue)
 │   │   │   │   ├── AdminLayout.tsx
 │   │   │   │   └── pages/
-│   │   │   │       ├── Announcements.tsx       # ✅ Full CRUD
-│   │   │   │       ├── CSVUpload.tsx           # ✅ Bulk Upload
-│   │   │   │       ├── LibraryStatus.tsx       # ✅ Update Status
-│   │   │   │       ├── ManageBookings.tsx      # ✅ Cancel Bookings (New)
-│   │   │   │       ├── ManagePricing.tsx       # ✅ Update Prices (New)
-│   │   │   │       ├── ManageSeats.tsx         # ✅ Seat CRUD
-│   │   │   │       └── ManageUsers.tsx         # ✅ View Users (New)
+│   │   │   │       ├── AdminProfile.tsx        # ✅ Added
+│   │   │   │       ├── Announcements.tsx       
+│   │   │   │       ├── AuditTrail.tsx          # ✅ NEW: User Login Audit
+│   │   │   │       ├── CSVUpload.tsx           
+│   │   │   │       ├── LibraryStatus.tsx       
+│   │   │   │       ├── ManageBookings.tsx      # ✅ Filters + Check-In Status
+│   │   │   │       ├── ManagePricing.tsx       
+│   │   │   │       ├── ManageSeats.tsx         
+│   │   │   │       └── ManageUsers.tsx         # ✅ Toggle Status (Active/Inactive)
 │   │   │   │
-│   │   │   ├── staff/                          # ✅ NEW STAFF PANEL
+│   │   │   ├── staff/                          
 │   │   │   │   ├── StaffLayout.tsx
 │   │   │   │   ├── components/
-│   │   │   │   │   ├── StaffSidebar.tsx
-│   │   │   │   │   └── StaffTopbar.tsx
 │   │   │   │   └── pages/
-│   │   │   │       ├── POS.tsx                 # ✅ Cash Point of Sale
-│   │   │   │       └── CheckIn.tsx             # ✅ QR Check-In
+│   │   │   │       ├── StaffBookings.tsx       # ✅ NEW: View Bookings
+│   │   │   │       ├── POS.tsx                 # ✅ Cash + Electricity
+│   │   │   │       ├── CheckIn.tsx             # ✅ QR Scanner
+│   │   │   │       └── StaffQueries.tsx        # ✅ Reply to users
 │   │   │   │
-│   │   │   ├── finance/                        # ✅ NEW FINANCE PANEL
+│   │   │   ├── finance/                        
 │   │   │   │   ├── FinanceLayout.tsx
 │   │   │   │   ├── components/
-│   │   │   │   │   ├── FinanceSidebar.tsx
-│   │   │   │   │   └── FinanceTopbar.tsx
 │   │   │   │   └── pages/
-│   │   │   │       └── Reports.tsx             # ✅ Daily/Weekly/Monthly
+│   │   │   │       └── Reports.tsx             # ✅ Bar Chart + Refunds + PDF
 │   │   │   │
 │   │   │   └── user/
-│   │   │       ├── UserDashboard.tsx           # User overview
+│   │   │       ├── UserDashboard.tsx           # ✅ Active Bookings logic
 │   │   │       ├── UserLayout.tsx
 │   │   │       └── pages/
-│   │   │           ├── UserBookings.tsx        # ✅ Cancelled hidden
+│   │   │           ├── UserBookings.tsx        # ✅ Active/History tabs + Delete History
 │   │   │           ├── UserProfile.tsx
-│   │   │           └── UserTickets.tsx         # ✅ No Delete button
+│   │   │           └── UserTickets.tsx         
 │   │   │
 │   │   ├── home/
-│   │   │   ├── Home.tsx                        # Home page
+│   │   │   ├── Home.tsx                        
 │   │   │   └── components/
-│   │   │       ├── AnnouncementsBar.tsx        # ✅ Live from admin
-│   │   │       ├── ContactSection.tsx
-│   │   │       ├── Footer.tsx
-│   │   │       ├── Hero.tsx
-│   │   │       ├── HowToUse.tsx                # ✅ How to buy ticket
-│   │   │       ├── LibrarySections.tsx         # ✅ Live seat counts
-│   │   │       ├── LibraryStatus.tsx           # ✅ Live status
-│   │   │       ├── Newsletter.tsx
+│   │   │       ├── AnnouncementsBar.tsx        
+│   │   │       ├── Footer.tsx                  # ✅ NLS Colors
+│   │   │       ├── Hero.tsx                    # ✅ Carousel + Story + Stats
+│   │   │       ├── HowToUse.tsx                # ✅ "Buy a Ticket" (includes POS)
+│   │   │       ├── LibrarySections.tsx         # ✅ Only 2 sections
+│   │   │       ├── LibraryStatus.tsx           
+│   │   │       ├── Newsletter.tsx              # ✅ NLS Colors
 │   │   │       ├── Partners.tsx
-│   │   │       └── Stats.tsx                   # ✅ Live counters
+│   │   │       └── Stats.tsx                   
 │   │   │
 │   │   ├── payments/
-│   │   │   ├── PaymentPage.tsx                 # Pay with PayChangu
+│   │   │   ├── PaymentPage.tsx                 # ✅ Dynamic Amount
 │   │   │   └── components/
-│   │   │       ├── PaymentCancel.tsx
-│   │   │       └── PaymentSuccess.tsx
 │   │   │
 │   │   ├── queries/
-│   │   │   ├── Queries.tsx                     # Support page
+│   │   │   ├── Queries.tsx                     
 │   │   │   └── components/
-│   │   │       └── QueryCard.tsx
 │   │   │
 │   │   ├── seats/
-│   │   │   ├── SeatMap.tsx                     # Interactive map
+│   │   │   ├── SeatMap.tsx                     
 │   │   │   └── components/
-│   │   │       ├── Seat.tsx
-│   │   │       ├── SeatLegend.tsx
-│   │   │       └── SectionTabs.tsx
 │   │   │
 │   │   └── tickets/
 │   │       ├── MyTickets.tsx
-│   │       └── TicketCard.tsx                  # ✅ QR + Issued time
+│   │       └── TicketCard.tsx                  
 │   │
 │   ├── hooks/
 │   │   └── useAuth.ts
 │   │
 │   ├── App.tsx                                 # Main app + routes
-│   ├── index.css                               # Tailwind
+│   ├── index.css                               # Tailwind + Font Config
 │   └── main.tsx                                # Entry point
 │
 ├── .env                                        # VITE_API_URL
 ├── package.json
-├── tailwind.config.js
+├── tailwind.config.js                          # ✅ NLS Colors + Ubuntu Font
 └── vite.config.ts
 
 ## 🔐 Environment Variables
@@ -234,9 +221,9 @@ Go to https://vercel.com/dashboard
 
 Click your project
 
-CCOMPLETE SYSTEM FLOW
+COMPLETE SYSTEM FLOW
 1. Public Home Page (No Login)
-A visitor accesses the public home page featuring the new NLS branding, Top Status Banner (Open/Closed/Full/Maintenance), and live stats. The announcements bar displays notices, and the library status section shows real-time info. Users can view sections but must log in to book.
+A visitor accesses the public home page featuring the new NLS Deep Navy branding, Top Status Banner (Open/Closed/Full/Maintenance), Ubuntu Font, and live stats grouped inside the Hero section. The library section overview only shows General and Computer . The "How to Buy a Ticket" section now includes the POS (Cash) option.
 
 2. Registration / Login
 Users register/login via email. The system verifies credentials and redirects based on role:
@@ -245,54 +232,60 @@ user → User Dashboard
 
 admin → Admin Dashboard
 
-staff → Staff POS & Check-in Dashboard
+staff → Staff POS, Check-In & Bookings
 
 finance → Financial Reports Dashboard
 
 3. Online Booking (User)
-Users select seats (across multiple sections in one session), review the summary, and pay via PayChangu. Upon payment, a ticket with a QR code is generated and emailed to the user. (Note: Users can no longer delete tickets or enter occupant names).
+Users select seats (across multiple sections), choose if they need Electricity (+400 MWK), review the summary, and pay via PayChangu. Upon payment, a ticket with a QR code is generated and emailed. Users cannot delete tickets. If a booking date passes, it moves to the History tab where the user can permanently delete it.
 
 4. Point of Sale / Cash Ticketing (Staff)
-Library staff log into the Staff Dashboard and use the POS Portal. They select seats on the map, enter the occupant's name and email, and confirm cash received. The system generates a paid ticket and emails it immediately without calling PayChangu.
+Library staff log into the Staff Dashboard and use the POS Portal. They select seats on the map, enter the occupant's name and email, add Electricity if needed, and confirm cash received. The system dynamically calculates the real price (seat price + electricity) and emails the ticket immediately.
 
 5. Check-In (Staff)
-When a user arrives, staff use the Check-In portal. They can scan the QR code using the camera or type the ticket number. Once verified, they click check-in, which marks the ticket as checked_in in the database.
+When a user arrives, staff use the Check-In portal. They can scan the QR code using the camera, upload an image, or type the ticket number. Once verified, they click check-in. If a booking was cancelled or refunded, the scanner blocks it with an "INVALID" message.
 
 6. Financial Reports (Finance Officer)
-The Financial Officer logs in to view daily, weekly, and monthly revenue reports, separated by Online (PayChangu) and Cash (POS) payments.
+The Financial Officer logs in to view Daily, Weekly, and Monthly revenue reports, complete with a Revenue Bar Chart, transaction history (including Cancelled/Refunded), PDF/CSV exports, and the ability to Process Refunds.
 
 7. Admin Management (Admin)
 The Administrator manages the entire system:
 
 Manage Seats: Add, edit, or delete seats.
 
-Manage Bookings: View all bookings and cancel any ticket/booking if needed.
+Manage Bookings: View all bookings, check if users have checked in, and cancel if needed.
 
-Price Management: Update the cost per seat for each library section.
+Price Management: Update the cost per seat.
 
-Manage Users: View all registered users.
+Manage Users: View, search, activate, or deactivate accounts. Includes an Audit Trail to track last logins.
 
 Announcements & Library Status: Update the public home page instantly.
 
-🎯 New Features (Supervisor Updates)
+🎯 New Features 
 Top Status Banner: Added to the Navbar. Shows live state and hours.
+
+NLS Font & Colors: App uses Ubuntu font and Deep Navy (#082845) / Medium Blue (#186BB1) themes.
 
 "Buy Ticket" Button: Now hides if the library is not OPEN.
 
 Multi-Section Selection: Users can select seats across sections in one go.
 
-No Occupant Names: Removed from User booking flow.
+No Occupant Names (Online): Removed from User booking flow. Automatically attaches the user's name.
 
-No Ticket Deletion: Users can no longer delete tickets from "My Tickets".
+No Ticket Deletion: Users can no longer delete active tickets.
 
+Electricity Add-On: Users & Staff can add MWK 400 to their booking for power.
+
+Dynamic Pricing: Backend now calculates the real amount based on the section price + electricity
 Staff POS: A portal for Library Staff to process cash payments.
 
-Staff Check-In: QR Camera scanner and manual verification.
+Staff Check-In: QR Camera scanner, image upload, and manual verification. Blocks cancelled tickets.
 
-Finance Dashboard: Real-time revenue tracking for the Financial Officer.
+Finance Dashboard: Real-time revenue tracking, Bar Chart, PDF/CSV export, and Refund processing.
 
-📄 License
-MIT
+User History: Bookings past their date move to a "History" tab and can be permanently deleted.
+
+Admin Audit Trail: Admins can view the last login time of every user.
 
 👨‍💻 Author
 alibuprojectLTS
