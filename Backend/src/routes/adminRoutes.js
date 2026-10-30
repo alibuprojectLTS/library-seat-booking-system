@@ -1,11 +1,12 @@
 import express from 'express';
 import {
   getDashboardStats,
-  cancelBookingAdmin, // ✅ Imported
+  cancelBookingAdmin,
   getAllQueries,
   replyToQuery,
   deleteInactiveUsers,
   getAllUsers,
+  toggleUserStatus, // ✅ Imported
   createAnnouncement,
   getAllAnnouncementsAdmin,
   updateAnnouncementAdmin,
@@ -29,7 +30,7 @@ router.use(isAdmin);
 // Dashboard
 router.get('/dashboard', getDashboardStats);
 
-// ✅ Bookings (Admin Override)
+// Bookings (Admin Override)
 router.delete('/bookings/:id/cancel', cancelBookingAdmin);
 
 // Queries
@@ -39,6 +40,7 @@ router.post('/queries/:id/reply', replyToQuery);
 // Users
 router.get('/users', getAllUsers);
 router.delete('/users/inactive', deleteInactiveUsers);
+router.put('/users/:id/toggle', toggleUserStatus); // ✅ Added Route
 
 // Sections & Pricing
 router.get('/sections', getAllSectionsAdmin);

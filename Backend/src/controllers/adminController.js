@@ -643,3 +643,36 @@ export const searchBookings = async (req, res) => {
     });
   }
 };
+
+/**
+ * Toggle User Active Status (Admin)
+ */
+export const toggleUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const adminId = req.user.userId;
+
+    // Prevent admin from deactivating themselves
+    if (Number(id) === Number(adminId)) {
+      return res.status(400).json({ success: false, message: 'You cannot change your own status.' });
+    }
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Toggle the status
+    const newStatus = !user.is_active;
+    await user.update({ is_active: newStatus });
+
+    res.json({
+      success: true,
+      message: `User ${newStatus ? 'activated' : 'deactivated'} successfully`,
+      is_active: newStatus
+    });
+  } catch (error) {
+    console.error('Toggle user status error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update user status' });
+  }
+};
